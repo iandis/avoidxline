@@ -32,7 +32,7 @@ public class Controller {
     @Qualifier("lineSignatureValidator")
     private LineSignatureValidator lineSignatureValidator;
 
-    @RequestMapping(value="https://implinejava.herokuapp.com/webhook", method= RequestMethod.POST)
+    @RequestMapping(value="/webhook", method= RequestMethod.POST)
     public ResponseEntity<String> callback(
             @RequestHeader("X-Line-Signature") String xLineSignature,
             @RequestBody String eventsPayload)
