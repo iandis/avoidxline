@@ -6,6 +6,7 @@ import com.linecorp.bot.client.LineSignatureValidator;
 import com.linecorp.bot.model.ReplyMessage;
 import com.linecorp.bot.model.event.MessageEvent;
 import com.linecorp.bot.model.event.message.TextMessageContent;
+import com.linecorp.bot.model.message.Message;
 import com.linecorp.bot.model.message.StickerMessage;
 import com.linecorp.bot.model.message.TextMessage;
 import com.linecorp.bot.model.objectmapper.ModelObjectMapper;
@@ -16,6 +17,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 @RestController
@@ -47,7 +50,11 @@ public class Controller {
                 if (event instanceof MessageEvent) {
                     MessageEvent messageEvent = (MessageEvent) event;
                     TextMessageContent textMessageContent = (TextMessageContent) messageEvent.getMessage();
-                    replyText(messageEvent.getReplyToken(), textMessageContent.getText());
+                    List<Message> msgArray = new ArrayList<>();
+                    msgArray.add(new TextMessage(textMessageContent.getText()));
+                    msgArray.add(new StickerMessage("1", "106"));
+                    ReplyMessage replyMessage = new ReplyMessage(messageEvent.getReplyToken(), msgArray);
+                    reply(replyMessage);
                 }
             });
 
