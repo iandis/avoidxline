@@ -1,4 +1,4 @@
-package com.ianline.implineJava;
+package com.avoprojects.avoidxline;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonInclude;

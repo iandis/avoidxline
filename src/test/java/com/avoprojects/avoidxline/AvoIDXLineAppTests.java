@@ -1,10 +1,10 @@
-package com.ianline.implineJava;
+package com.avoprojects.avoidxline;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class ImplineJavaApplicationTests {
+class AvoIDXLineAppTests {
 
 	@Test
 	void contextLoads() {

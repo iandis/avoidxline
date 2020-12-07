@@ -1,4 +1,4 @@
-package com.ianline.implineJava;
+package com.avoprojects.avoidxline;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.linecorp.bot.client.LineMessagingClient;
@@ -83,7 +83,7 @@ public class Controller {
         } else if(event.getMessage() instanceof TextMessageContent) {
             handleTextMessage(event);
         } else {
-            replyText(event.getReplyToken(), "Apaan dah?");
+            replyText(event.getReplyToken(), "Unknown Message");
         }
     }
     private void handleGroupRoomChats(MessageEvent event) {
@@ -96,7 +96,7 @@ public class Controller {
         }
     }
     private void handleContentMessage(MessageEvent event) {
-        String baseURL     = "https://implinejava.herokuapp.com";
+        String baseURL     = "https://avoidxline.herokuapp.com";
         String contentURL  = baseURL+"/content/"+ event.getMessage().getId();
         String contentType = event.getMessage().getClass().getSimpleName();
         String textMsg     = contentType.substring(0, contentType.length() -14)

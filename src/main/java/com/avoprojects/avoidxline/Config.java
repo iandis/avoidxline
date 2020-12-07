@@ -1,4 +1,4 @@
-package com.ianline.implineJava;
+package com.avoprojects.avoidxline;
 
 import com.linecorp.bot.client.LineMessagingClient;
 import com.linecorp.bot.client.LineSignatureValidator;
