@@ -110,9 +110,9 @@ public class Controller {
                     switch (keywords[i]) {
                         case "jadwal uts":
                             replyFlexMessage(event.getReplyToken());
-                            break;
+                            return;
                         case "saham":
-                                    /*String symbol = msg.toUpperCase().substring(6); //misal teks "saham BBCA", berarti memisahkan teks "saham " dengan "BBCA"
+                                    String symbol = textMessageContent.getText().toUpperCase().substring(6); //misal teks "saham BBCA", berarti memisahkan teks "saham " dengan "BBCA"
                                     StocksAPI Stocks = new StocksAPI(symbol+".JK");
                                     Stocks.join();
                                     String[] dataaset = Stocks.getSingleQuote();
@@ -123,21 +123,14 @@ public class Controller {
                                                 + dataaset[2] + " ("+dataaset[3]+")" );
                                     } else {
                                         replyText(event.getReplyToken(), symbol + " tidak ditemukan.");
-                                    }*/
-                                    break;
-                        default:
-                            break;
+                                    }
+                                    return;
                     }
-                } else {
-                    replyText(event.getReplyToken(), "Keyword salah:(");
-                    return;
                 }
-            } else {
-            replyText(event.getReplyToken(), "Keyword salah:( (Error)");
-            return;
+            }
         }
+        replyText(event.getReplyToken(), "Keyword salah:( (Error)");
         }
-    }
     private void replyFlexMessage(String replyToken) {
         try {
             ClassLoader classLoader = getClass().getClassLoader();
