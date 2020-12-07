@@ -27,9 +27,7 @@
             "gravity": "center"
           }
         ],
-        "paddingTop": "19px",
-        "paddingAll": "12px",
-        "paddingBottom": "16px"
+        "paddingBottom": "20%"
       },
       "body": {
         "type": "box",
@@ -46,12 +44,10 @@
                 "size": "sm",
                 "wrap": true
               }
-            ],
-            "flex": 1
+            ]
           }
         ],
         "spacing": "md",
-        "paddingAll": "12px",
         "backgroundColor": "#FFFFFF"
       },
       "styles": {
@@ -89,9 +85,7 @@
             "margin": "xl"
           }
         ],
-        "paddingTop": "19px",
-        "paddingAll": "12px",
-        "paddingBottom": "16px"
+        "paddingBottom": "20%"
       },
       "body": {
         "type": "box",
@@ -108,12 +102,10 @@
                 "size": "sm",
                 "wrap": true
               }
-            ],
-            "flex": 1
+            ]
           }
         ],
         "spacing": "md",
-        "paddingAll": "12px",
         "backgroundColor": "#FFFFFF"
       },
       "styles": {
@@ -151,9 +143,7 @@
             "margin": "xl"
           }
         ],
-        "paddingTop": "19px",
-        "paddingAll": "12px",
-        "paddingBottom": "16px"
+        "paddingBottom": "20%"
       },
       "body": {
         "type": "box",
@@ -170,12 +160,10 @@
                 "size": "sm",
                 "wrap": true
               }
-            ],
-            "flex": 1
+            ]
           }
         ],
         "spacing": "md",
-        "paddingAll": "12px",
         "backgroundColor": "#ffffff"
       },
       "styles": {
@@ -213,9 +201,7 @@
             "margin": "xl"
           }
         ],
-        "paddingTop": "19px",
-        "paddingAll": "12px",
-        "paddingBottom": "16px"
+        "paddingBottom": "20%"
       },
       "body": {
         "type": "box",
@@ -232,12 +218,10 @@
                 "size": "sm",
                 "wrap": true
               }
-            ],
-            "flex": 1
+            ]
           }
         ],
         "spacing": "md",
-        "paddingAll": "12px",
         "backgroundColor": "#ffffff"
       },
       "styles": {
