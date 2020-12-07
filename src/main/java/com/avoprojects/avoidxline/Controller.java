@@ -111,28 +111,32 @@ public class Controller {
         TextMessageContent textMessageContent = (TextMessageContent) event.getMessage();
         String msg=textMessageContent.getText();
         for(int i=0;i<=keywords.length-1;i++){
-            if(msg.toLowerCase().substring(0,keywords[i].length()).equals(keywords[i])) {
-                switch (keywords[i]) {
-                    case "jadwal uts":
-                        replyFlexMessage(event.getReplyToken());
-                        break;
-                    case "saham":
-                        String symbol = msg.toUpperCase().substring(6); //misal teks "saham BBCA", berarti memisahkan teks "saham " dengan "BBCA"
-                        BigDecimal[] datasaham = getSingleQuote(symbol+".JK");
-                        if (datasaham != null) {
-                            BigDecimal price = datasaham[0];
-                            String change = (datasaham[1].compareTo(BigDecimal.valueOf(0.0)) > 0 ? "+" + datasaham[1] : datasaham[1].toString());
-                            String changep = (datasaham[2].compareTo(BigDecimal.valueOf(0.0)) > 0 ? "+" + datasaham[2] + "%" : datasaham[2] + "%");
-                            replyText(event.getReplyToken(), "[" + symbol + "]\n" + price + "\n" + change + "\n" + changep);
-                        } else {
-                            replyText(event.getReplyToken(), symbol + " tidak ditemukan.");
-                        }
-                        break;
-                    default:
+            if(msg.length()>keywords[i].length()) {
+                if (msg.toLowerCase().substring(0, keywords[i].length()).equals(keywords[i])) {
+                    switch (keywords[i]) {
+                        case "jadwal uts":
+                            replyFlexMessage(event.getReplyToken());
+                            break;
+                        case "saham":
+                            String symbol = msg.toUpperCase().substring(6); //misal teks "saham BBCA", berarti memisahkan teks "saham " dengan "BBCA"
+                            BigDecimal[] datasaham = getSingleQuote(symbol + ".JK");
+                            if (datasaham != null) {
+                                BigDecimal price = datasaham[0];
+                                String change = (datasaham[1].compareTo(BigDecimal.valueOf(0.0)) > 0 ? "+" + datasaham[1] : datasaham[1].toString());
+                                String changep = (datasaham[2].compareTo(BigDecimal.valueOf(0.0)) > 0 ? "+" + datasaham[2] + "%" : datasaham[2] + "%");
+                                replyText(event.getReplyToken(), "[" + symbol + "]\n" + price + "\n" + change + "\n" + changep);
+                            } else {
+                                replyText(event.getReplyToken(), symbol + " tidak ditemukan.");
+                            }
+                            break;
+                        default:
+                    }
+                } else {
+                    replyText(event.getReplyToken(), "Keyword salah:(");
                 }
-            }else{
-                replyText(event.getReplyToken(), "Keyword salah:(");
-            }
+            } else {
+            replyText(event.getReplyToken(), "Keyword salah:(");
+        }
         }
         /*if (textMessageContent.getText().toLowerCase().contains("jadwal uts")) {
             replyFlexMessage(event.getReplyToken());
