@@ -104,7 +104,6 @@ public class Controller {
     }
     private void handleTextMessage(MessageEvent event) {
         TextMessageContent textMessageContent = (TextMessageContent) event.getMessage();
-
         for(int i=0;i<keywords.length;i++){
             if(textMessageContent.getText().length()>keywords[i].length()) {
                 if (textMessageContent.getText().toLowerCase().substring(0, keywords[i].length()).equals(keywords[i])) {
@@ -114,7 +113,7 @@ public class Controller {
                             break;
                         case "saham":
                                     /*String symbol = msg.toUpperCase().substring(6); //misal teks "saham BBCA", berarti memisahkan teks "saham " dengan "BBCA"
-                                    StocksAPI Stocks = new StocksAPI(symbol);
+                                    StocksAPI Stocks = new StocksAPI(symbol+".JK");
                                     Stocks.join();
                                     String[] dataaset = Stocks.getSingleQuote();
                                     if (dataaset != null) {
@@ -131,9 +130,11 @@ public class Controller {
                     }
                 } else {
                     replyText(event.getReplyToken(), "Keyword salah:(");
+                    return;
                 }
             } else {
             replyText(event.getReplyToken(), "Keyword salah:( (Error)");
+            return;
         }
         }
     }
