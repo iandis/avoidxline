@@ -113,18 +113,18 @@ public class Controller {
                             replyFlexMessage(event.getReplyToken());
                             break;
                         case "saham":
-                                    String symbol = msg.toUpperCase().substring(6); //misal teks "saham BBCA", berarti memisahkan teks "saham " dengan "BBCA"
+                                    /*String symbol = msg.toUpperCase().substring(6); //misal teks "saham BBCA", berarti memisahkan teks "saham " dengan "BBCA"
                                     StocksAPI Stocks = new StocksAPI(symbol);
                                     Stocks.join();
                                     String[] dataaset = Stocks.getSingleQuote();
                                     if (dataaset != null) {
-                                        replyText(event.getReplyToken(), dataaset[0] /*nama panjang*/+
+                                        replyText(event.getReplyToken(), dataaset[0] +
                                                 " ("+symbol+")\n"
-                                                + dataaset[1] + "\n" /*nilai aset*/
-                                                + dataaset[2] + " ("+dataaset[3]+")" /*perubahan nilai (persen)*/);
+                                                + dataaset[1] + "\n"
+                                                + dataaset[2] + " ("+dataaset[3]+")" );
                                     } else {
                                         replyText(event.getReplyToken(), symbol + " tidak ditemukan.");
-                                    }
+                                    }*/
                                     break;
                         default:
                             break;
@@ -133,7 +133,7 @@ public class Controller {
                     replyText(event.getReplyToken(), "Keyword salah:(");
                 }
             } else {
-            replyText(event.getReplyToken(), "Keyword salah:(");
+            replyText(event.getReplyToken(), "Keyword salah:( (Error)");
         }
         }
     }
