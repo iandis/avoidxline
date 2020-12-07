@@ -104,10 +104,10 @@ public class Controller {
     }
     private void handleTextMessage(MessageEvent event) {
         TextMessageContent textMessageContent = (TextMessageContent) event.getMessage();
-        String msg=textMessageContent.getText();
+
         for(int i=0;i<keywords.length;i++){
-            if(msg.length()>keywords[i].length()) {
-                if (msg.toLowerCase().substring(0, keywords[i].length()).equals(keywords[i])) {
+            if(textMessageContent.getText().length()>keywords[i].length()) {
+                if (textMessageContent.getText().toLowerCase().substring(0, keywords[i].length()).equals(keywords[i])) {
                     switch (keywords[i]) {
                         case "jadwal uts":
                             replyFlexMessage(event.getReplyToken());
