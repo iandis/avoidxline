@@ -273,19 +273,20 @@ public class Controller {
         reply(replyMessage);
     }
 
-    private BigDecimal[] getSingleQuote(String symbol){
+    private synchronized BigDecimal[] getSingleQuote(String symbol){
         try {
             Stock stock = YahooFinance.get(symbol);
             BigDecimal price = stock.getQuote().getPrice();
             BigDecimal change = stock.getQuote().getChange();
             BigDecimal changep = stock.getQuote().getChangeInPercent();
+            Thread.sleep(1000);
             return new BigDecimal[]{price, change, changep};
         } catch (Exception ex) {
             //System.err.println("Error: No such symbol");
             return null;
         }
     }
-    private Map<String,Stock> getMultiQuote(String[] symbols){
+    private synchronized Map<String,Stock> getMultiQuote(String[] symbols){
         try {
             Map<String, Stock> stocks = YahooFinance.get(symbols);
             return stocks;
