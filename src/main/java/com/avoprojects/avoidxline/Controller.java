@@ -118,17 +118,22 @@ public class Controller {
                             replyFlexMessage(event.getReplyToken());
                             break;
                         case "saham":
-                            String symbol = msg.toUpperCase().substring(6); //misal teks "saham BBCA", berarti memisahkan teks "saham " dengan "BBCA"
-                            BigDecimal[] datasaham = getSingleQuote(symbol + ".JK");
-                            if (datasaham != null) {
-                                BigDecimal price = datasaham[0];
-                                String change = (datasaham[1].compareTo(BigDecimal.valueOf(0.0)) > 0 ? "+" + datasaham[1] : datasaham[1].toString());
-                                String changep = (datasaham[2].compareTo(BigDecimal.valueOf(0.0)) > 0 ? "+" + datasaham[2] + "%" : datasaham[2] + "%");
-                                replyText(event.getReplyToken(), "[" + symbol + "]\n" + price + "\n" + change + "\n" + changep);
-                            } else {
-                                replyText(event.getReplyToken(), symbol + " tidak ditemukan.");
-                            }
-                            break;
+                                try {
+                                    String symbol = msg.toUpperCase().substring(6); //misal teks "saham BBCA", berarti memisahkan teks "saham " dengan "BBCA"
+                                    BigDecimal[] datasaham = getSingleQuote(symbol + ".JK");
+                                    wait(1000);
+                                    if (datasaham != null) {
+                                        BigDecimal price = datasaham[0];
+                                        String change = (datasaham[1].compareTo(BigDecimal.valueOf(0.0)) > 0 ? "+" + datasaham[1] : datasaham[1].toString());
+                                        String changep = (datasaham[2].compareTo(BigDecimal.valueOf(0.0)) > 0 ? "+" + datasaham[2] + "%" : datasaham[2] + "%");
+                                        replyText(event.getReplyToken(), "[" + symbol + "]\n" + price + "\n" + change + "\n" + changep);
+                                    } else {
+                                        replyText(event.getReplyToken(), symbol + " tidak ditemukan.");
+                                    }
+                                    break;
+                                }catch(Exception e){
+
+                                }
                         default:
                     }
                 } else {
@@ -273,17 +278,16 @@ public class Controller {
         reply(replyMessage);
     }
 
-    private synchronized BigDecimal[] getSingleQuote(String symbol){
+    private BigDecimal[] getSingleQuote(String symbol){
         try {
             Stock stock = YahooFinance.get(symbol);
             BigDecimal price = stock.getQuote().getPrice();
             BigDecimal change = stock.getQuote().getChange();
             BigDecimal changep = stock.getQuote().getChangeInPercent();
-            Thread.sleep(1000);
             return new BigDecimal[]{price, change, changep};
         } catch (Exception ex) {
             //System.err.println("Error: No such symbol");
-            return null;
+            return null;//new BigDecimal[]{BigDecimal.ZERO,BigDecimal.ZERO,BigDecimal.ZERO};
         }
     }
     private synchronized Map<String,Stock> getMultiQuote(String[] symbols){
