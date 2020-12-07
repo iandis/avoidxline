@@ -105,7 +105,7 @@ public class Controller {
     private void handleTextMessage(MessageEvent event) {
         TextMessageContent textMessageContent = (TextMessageContent) event.getMessage();
         for(int i=0;i<keywords.length;i++){
-            if(textMessageContent.getText().length()>keywords[i].length()) {
+            if(textMessageContent.getText().length()>=keywords[i].length()) {
                 if (textMessageContent.getText().toLowerCase().substring(0, keywords[i].length()).equals(keywords[i])) {
                     switch (keywords[i]) {
                         case "jadwal uts":
@@ -129,7 +129,7 @@ public class Controller {
                 }
             }
         }
-        replyText(event.getReplyToken(), "Keyword salah:( (Error)");
+        replyText(event.getReplyToken(), "Keyword salah:(");
         }
     private void replyFlexMessage(String replyToken) {
         try {
