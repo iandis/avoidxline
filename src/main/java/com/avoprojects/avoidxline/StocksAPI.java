@@ -7,7 +7,7 @@ import java.net.URL;
 import org.json.JSONObject;
 
 class StocksAPI implements Runnable {
-    private String symbol, longName, price, change, changep;
+    private String symbol, shortName, price, change, changep;
     private int res;
     private Thread t;
     StocksAPI(String symbol){
@@ -17,7 +17,7 @@ class StocksAPI implements Runnable {
     }
     public String[] getSingleQuote(){
         if(res>0){
-            return new String[]{longName, price, change, changep};
+            return new String[]{shortName, price, change, changep};
         }else{
             return null;
         }
@@ -57,7 +57,7 @@ class StocksAPI implements Runnable {
                 res=0;
             }else{
                 res=1;
-                longName = yfresult.getString("longName");
+                shortName = yfresult.getString("shortName");
                 double mPrice = yfresult.getDouble("regularMarketPrice");
                 double mChange = yfresult.getDouble("regularMarketChange");
                 double mChangep = yfresult.getDouble("regularMarketChangePercent");
