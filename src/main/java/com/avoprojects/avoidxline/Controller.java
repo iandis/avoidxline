@@ -9,8 +9,6 @@ import com.linecorp.bot.model.PushMessage;
 import com.linecorp.bot.model.ReplyMessage;
 import com.linecorp.bot.model.event.MessageEvent;
 import com.linecorp.bot.model.event.message.*;
-//import com.linecorp.bot.model.event.message.TextMessageContent;
-//import com.linecorp.bot.model.message.Message;
 import com.linecorp.bot.model.event.source.*;
 import com.linecorp.bot.model.message.FlexMessage;
 import com.linecorp.bot.model.message.StickerMessage;
@@ -19,6 +17,7 @@ import com.linecorp.bot.model.message.flex.container.FlexContainer;
 import com.linecorp.bot.model.objectmapper.ModelObjectMapper;
 import com.linecorp.bot.model.profile.UserProfileResponse;
 import org.apache.commons.io.IOUtils;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.io.InputStreamResource;
@@ -27,15 +26,18 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import yahoofinance.Stock;
+import yahoofinance.YahooFinance;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.math.BigDecimal;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 
 @RestController
 public class Controller {
-
+    private static String[] keywords=new String[]{"jadwal uts","saham"};
     @Autowired
     @Qualifier("lineMessagingClient")
     private LineMessagingClient lineMessagingClient;
@@ -107,12 +109,36 @@ public class Controller {
     }
     private void handleTextMessage(MessageEvent event) {
         TextMessageContent textMessageContent = (TextMessageContent) event.getMessage();
-
-        if (textMessageContent.getText().toLowerCase().contains("jadwal uts")) {
+        String msg=textMessageContent.getText();
+        for(int i=0;i<=keywords.length-1;i++){
+            if(msg.toLowerCase().substring(0,keywords[i].length()).equals(keywords[i])) {
+                switch (keywords[i]) {
+                    case "jadwal uts":
+                        replyFlexMessage(event.getReplyToken());
+                        break;
+                    case "saham":
+                        String symbol = msg.toUpperCase().substring(6); //misal teks "saham BBCA", berarti memisahkan teks "saham " dengan "BBCA"
+                        BigDecimal[] datasaham = getSingleQuote(symbol);
+                        if (datasaham != null) {
+                            BigDecimal price = datasaham[0];
+                            String change = (datasaham[1].compareTo(BigDecimal.valueOf(0.0)) > 0 ? "+" + datasaham[1] : datasaham[1].toString());
+                            String changep = (datasaham[2].compareTo(BigDecimal.valueOf(0.0)) > 0 ? "+" + datasaham[2] + "%" : datasaham[2] + "%");
+                            replyText(event.getReplyToken(), "[" + symbol + "]\n" + price + "\n" + change + "\n" + changep);
+                        } else {
+                            replyText(event.getReplyToken(), symbol + " tidak ditemukan.");
+                        }
+                        break;
+                    default:
+                }
+            }else{
+                replyText(event.getReplyToken(), "Keyword salah:(");
+            }
+        }
+        /*if (textMessageContent.getText().toLowerCase().contains("jadwal uts")) {
             replyFlexMessage(event.getReplyToken());
         } else {
             replyText(event.getReplyToken(), textMessageContent.getText());
-        }
+        }*/
     }
     private void replyFlexMessage(String replyToken) {
         try {
@@ -243,4 +269,25 @@ public class Controller {
         reply(replyMessage);
     }
 
+    private BigDecimal[] getSingleQuote(String symbol){
+        try {
+            Stock stock = YahooFinance.get(symbol);
+            BigDecimal price = stock.getQuote().getPrice();
+            BigDecimal change = stock.getQuote().getChange();
+            BigDecimal changep = stock.getQuote().getChangeInPercent();
+            return new BigDecimal[]{price, change, changep};
+        } catch (Exception ex) {
+            //System.err.println("Error: No such symbol");
+            return null;
+        }
+    }
+    private Map<String,Stock> getMultiQuote(String[] symbols){
+        try {
+            Map<String, Stock> stocks = YahooFinance.get(symbols);
+            return stocks;
+        } catch (Exception ex) {
+            //System.err.println("Error: No such symbol");
+            return null;
+        }
+    }
 }
