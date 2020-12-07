@@ -118,7 +118,7 @@ public class Controller {
                         break;
                     case "saham":
                         String symbol = msg.toUpperCase().substring(6); //misal teks "saham BBCA", berarti memisahkan teks "saham " dengan "BBCA"
-                        BigDecimal[] datasaham = getSingleQuote(symbol);
+                        BigDecimal[] datasaham = getSingleQuote(symbol+".JK");
                         if (datasaham != null) {
                             BigDecimal price = datasaham[0];
                             String change = (datasaham[1].compareTo(BigDecimal.valueOf(0.0)) > 0 ? "+" + datasaham[1] : datasaham[1].toString());
