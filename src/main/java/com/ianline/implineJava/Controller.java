@@ -60,7 +60,7 @@ public class Controller {
                             || ((MessageEvent) event).getMessage() instanceof VideoMessageContent
                             || ((MessageEvent) event).getMessage() instanceof FileMessageContent
                     ) {
-                        String baseURL     = "https://contohlinebotjava.herokuapp.com";
+                        String baseURL     = "https://implinejava.herokuapp.com";
                         String contentURL  = baseURL+"/content/"+ ((MessageEvent) event).getMessage().getId();
                         String contentType = ((MessageEvent) event).getMessage().getClass().getSimpleName();
                         String textMsg     = contentType.substring(0, contentType.length() -14)
