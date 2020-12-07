@@ -21,23 +21,23 @@ import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.io.InputStreamResource;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
-import yahoofinance.Stock;
-import yahoofinance.YahooFinance;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.math.BigDecimal;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import org.json.JSONObject;
 
 @RestController
 public class Controller {
     private static String[] keywords=new String[]{"jadwal uts","saham"};
+    private static String yfapiUrl="https://query1.finance.yahoo.com/v7/finance/quote?symbols="; //yahoo finance api url
     @Autowired
     @Qualifier("lineMessagingClient")
     private LineMessagingClient lineMessagingClient;
@@ -118,22 +118,18 @@ public class Controller {
                             replyFlexMessage(event.getReplyToken());
                             break;
                         case "saham":
-                                try {
+
                                     String symbol = msg.toUpperCase().substring(6); //misal teks "saham BBCA", berarti memisahkan teks "saham " dengan "BBCA"
-                                    BigDecimal[] datasaham = getSingleQuote(symbol + ".JK");
-                                    wait(1000);
-                                    if (datasaham != null) {
-                                        BigDecimal price = datasaham[0];
-                                        String change = (datasaham[1].compareTo(BigDecimal.valueOf(0.0)) > 0 ? "+" + datasaham[1] : datasaham[1].toString());
-                                        String changep = (datasaham[2].compareTo(BigDecimal.valueOf(0.0)) > 0 ? "+" + datasaham[2] + "%" : datasaham[2] + "%");
-                                        replyText(event.getReplyToken(), "[" + symbol + "]\n" + price + "\n" + change + "\n" + changep);
+                                    String[] dataaset = getSingleQuote(symbol + ".JK");
+                                    if (dataaset != null) {
+                                        replyText(event.getReplyToken(), dataaset[0] /*nama panjang*/+
+                                                " ("+symbol+")\n"
+                                                + dataaset[1] + "\n" /*nilai aset*/
+                                                + dataaset[2] + " ("+dataaset[3]+")" /*perubahan nilai (persen)*/);
                                     } else {
                                         replyText(event.getReplyToken(), symbol + " tidak ditemukan.");
                                     }
                                     break;
-                                }catch(Exception e){
-
-                                }
                         default:
                     }
                 } else {
@@ -278,25 +274,50 @@ public class Controller {
         reply(replyMessage);
     }
 
-    private BigDecimal[] getSingleQuote(String symbol){
+    private String[] getSingleQuote(String symbol){
         try {
-            Stock stock = YahooFinance.get(symbol);
+            URL url = new URL(yfapiUrl);
+            HttpURLConnection con = (HttpURLConnection) url.openConnection();
+            // optional default is GET
+            con.setRequestMethod("GET");
+            //add request header
+            con.setRequestProperty("User-Agent", "Mozilla/5.0");
+            int responseCode = con.getResponseCode();
+            BufferedReader in = new BufferedReader(
+                    new InputStreamReader(con.getInputStream()));
+            String inputLine;
+            StringBuffer response = new StringBuffer();
+            while ((inputLine = in.readLine()) != null) {
+                response.append(inputLine);
+            }
+            in.close();
+            con.disconnect();
+            //Read JSON response and print
+            JSONObject yfjson = new JSONObject(response.toString());
+            JSONObject yfresult = yfjson.getJSONObject("quoteResponse").getJSONArray("result").getJSONObject(0);
+            if(yfresult.isEmpty()){
+                return null;
+            }else{
+                String longName = yfresult.getString("longName");
+                double mPrice = yfresult.getDouble("regularMarketPrice");
+                double mChange = yfresult.getDouble("regularMarketChange");
+                double mChangep = yfresult.getDouble("regularMarketChangePercent");
+                String price = String.format("%.2f",mPrice);
+                String change = String.format(mChange > 0 ? "+%.2f" : "%.2f",mChange);
+                String changep = String.format(mChangep > 0 ? "+%.2f%%" : "%.2f%%",mChangep);
+                return new String[]{longName, price, change, changep};
+            }
+            /*String change = (datasaham[1].compareTo(BigDecimal.valueOf(0.0)) > 0 ? "+" + datasaham[1] : datasaham[1].toString());
+            String changep = (datasaham[2].compareTo(BigDecimal.valueOf(0.0)) > 0 ? "+" + datasaham[2] + "%" : datasaham[2] + "%");*/
+            /*Stock stock = YahooFinance.get(symbol);
             BigDecimal price = stock.getQuote().getPrice();
             BigDecimal change = stock.getQuote().getChange();
             BigDecimal changep = stock.getQuote().getChangeInPercent();
-            return new BigDecimal[]{price, change, changep};
+            return new BigDecimal[]{price, change, changep};*/
         } catch (Exception ex) {
             //System.err.println("Error: No such symbol");
             return null;//new BigDecimal[]{BigDecimal.ZERO,BigDecimal.ZERO,BigDecimal.ZERO};
         }
     }
-    private synchronized Map<String,Stock> getMultiQuote(String[] symbols){
-        try {
-            Map<String, Stock> stocks = YahooFinance.get(symbols);
-            return stocks;
-        } catch (Exception ex) {
-            //System.err.println("Error: No such symbol");
-            return null;
-        }
-    }
+
 }
