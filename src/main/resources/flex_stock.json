@@ -14,8 +14,7 @@
         "offsetTop": "20%",
         "size": "4xl"
       }
-    ],
-    "backgroundColor": "#0D47A1"
+    ]
   },
   "body": {
     "type": "box",
@@ -103,7 +102,7 @@
         "action": {
           "type": "postback",
           "label": "Tambah ke Portofolio",
-          "data": "tambah ke portofolio",
+          "data": "tambahporto",
           "displayText": "+portofolio"
         },
         "style": "primary",
@@ -115,5 +114,10 @@
       }
     ],
     "flex": 0
+  },
+  "styles": {
+    "header": {
+      "backgroundColor": "#0D47A1"
+    }
   }
 }
