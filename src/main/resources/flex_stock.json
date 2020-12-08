@@ -1,0 +1,119 @@
+{
+  "type": "bubble",
+  "header": {
+    "type": "box",
+    "layout": "vertical",
+    "contents": [
+      {
+        "type": "text",
+        "text": "%1$s",
+        "color": "#FAFAFA",
+        "weight": "bold",
+        "margin": "none",
+        "align": "center",
+        "offsetTop": "20%",
+        "size": "4xl"
+      }
+    ],
+    "backgroundColor": "#0D47A1"
+  },
+  "body": {
+    "type": "box",
+    "layout": "vertical",
+    "contents": [
+      {
+        "type": "text",
+        "text": "%2$s",
+        "weight": "bold",
+        "size": "xl",
+        "margin": "none"
+      },
+      {
+        "type": "box",
+        "layout": "vertical",
+        "margin": "lg",
+        "spacing": "sm",
+        "contents": [
+          {
+            "type": "box",
+            "layout": "vertical",
+            "contents": [
+              {
+                "type": "text",
+                "text": "Market Cap",
+                "color": "#01579B",
+                "size": "xs"
+              },
+              {
+                "type": "text",
+                "text": "%3$s"
+              }
+            ]
+          },
+          {
+            "type": "box",
+            "layout": "vertical",
+            "contents": [
+              {
+                "type": "text",
+                "text": "Price",
+                "color": "#01579B",
+                "contents": [],
+                "size": "xs"
+              },
+              {
+                "type": "text",
+                "text": "%4$s"
+              }
+            ]
+          },
+          {
+            "type": "box",
+            "layout": "vertical",
+            "contents": [
+              {
+                "type": "text",
+                "text": "Change",
+                "color": "#01579B",
+                "contents": [],
+                "size": "xs"
+              },
+              {
+                "type": "text",
+                "text": "%5$s",
+                "color": "%6$s"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "spacing": "none",
+    "margin": "none",
+    "backgroundColor": "#EEEEEE"
+  },
+  "footer": {
+    "type": "box",
+    "layout": "vertical",
+    "spacing": "sm",
+    "contents": [
+      {
+        "type": "button",
+        "height": "md",
+        "action": {
+          "type": "postback",
+          "label": "Tambah ke Portofolio",
+          "data": "tambah ke portofolio",
+          "displayText": "+portofolio"
+        },
+        "style": "primary",
+        "color": "#2196F3"
+      },
+      {
+        "type": "spacer",
+        "size": "sm"
+      }
+    ],
+    "flex": 0
+  }
+}

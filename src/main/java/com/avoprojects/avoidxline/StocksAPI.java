@@ -2,12 +2,14 @@ package com.avoprojects.avoidxline;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import org.json.JSONObject;
 
 class StocksAPI implements Runnable {
-    private String symbol, shortName, price, change, changep;
+    private String symbol, marketCap, shortName, price, lastchange;
     private int res;
     private Thread t;
     StocksAPI(String symbol){
@@ -15,19 +17,31 @@ class StocksAPI implements Runnable {
         t = new Thread(this);
         t.start();
     }
-    public String[] getSingleQuote(){
-        if(res>0){
-            return new String[]{shortName, price, change, changep};
+    public String[] getSingleQuote() {
+        if (res > 0) {
+            return new String[]{shortName, marketCap, price, lastchange};
         }else{
-            return null;
+                return null;
+            }
         }
-    }
     public void join(){
         try{
             t.join();
         }catch(InterruptedException e){
             //e.printStackTrace();
         };
+    }
+    private static String formatMarketCap(double marketCap){
+        double mil = 1_000_000; //juta
+        double bil = 1_000_000_000; //milyar
+        double tri = bil*1000; //trilyun
+        if(marketCap>tri){
+            return String.format("%.2fT",(marketCap/tri));
+        }else if(marketCap>bil){
+            return String.format("%.2fB",(marketCap/bil));
+        }else{
+            return String.format("%.2fM",(marketCap/mil));
+        }
     }
     @Override
     public void run() {
@@ -53,6 +67,7 @@ class StocksAPI implements Runnable {
             //Read JSON response and print
             JSONObject yfjson = new JSONObject(response.toString());
             JSONObject yfresult = yfjson.getJSONObject("quoteResponse").getJSONArray("result").getJSONObject(0);
+            String change, changep;
             if(yfresult.isEmpty()){
                 res=0;
             }else{
@@ -61,9 +76,12 @@ class StocksAPI implements Runnable {
                 double mPrice = yfresult.getDouble("regularMarketPrice");
                 double mChange = yfresult.getDouble("regularMarketChange");
                 double mChangep = yfresult.getDouble("regularMarketChangePercent");
+                double mMarketcap = yfresult.getDouble("marketCap");
+                marketCap = formatMarketCap(mMarketcap);
                 price = String.format("%.2f",mPrice);
                 change = String.format(mChange > 0 ? "+%.2f" : "%.2f",mChange);
                 changep = String.format(mChangep > 0 ? "+%.2f%%" : "%.2f%%",mChangep);
+                lastchange = change + " (" + changep + ")";
             }
         } catch (Exception ex) {
             //System.err.println("Error: No such symbol");

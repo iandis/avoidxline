@@ -7,6 +7,8 @@ import com.linecorp.bot.client.MessageContentResponse;
 import com.linecorp.bot.model.Multicast;
 import com.linecorp.bot.model.PushMessage;
 import com.linecorp.bot.model.ReplyMessage;
+import com.linecorp.bot.model.event.FollowEvent;
+import com.linecorp.bot.model.event.JoinEvent;
 import com.linecorp.bot.model.event.MessageEvent;
 import com.linecorp.bot.model.event.message.*;
 import com.linecorp.bot.model.event.source.*;
@@ -61,6 +63,8 @@ public class Controller {
                     } else {
                         handleOneOnOneChats((MessageEvent) event);
                     }
+                }else if(event instanceof JoinEvent || event instanceof FollowEvent){
+
                 }
             });
 
@@ -117,10 +121,23 @@ public class Controller {
                                     Stocks.join();
                                     String[] dataaset = Stocks.getSingleQuote();
                                     if (dataaset != null) {
-                                        replyText(event.getReplyToken(), dataaset[0] +
+                                        ArrayList<String> dataset = new ArrayList<String>();
+                                        dataset.add(symbol);
+                                        for(int j=0;j<4;j++) {
+                                            dataset.add(dataaset[j]);
+                                        }
+                                        if(dataaset[3].contains("+")){
+                                            dataset.add("#2E7D32");
+                                        }else if(dataaset[3].contains("-")){
+                                            dataset.add("#C62828");
+                                        }else{
+                                            dataset.add("#000000");
+                                        }
+                                        replyFlexMessage(event.getReplyToken(),2,dataset);
+                                        /*replyText(event.getReplyToken(), dataaset[0] +
                                                 " ("+symbol+")\n"
                                                 + dataaset[1] + "\n"
-                                                + dataaset[2] + " ("+dataaset[3]+")" );
+                                                + dataaset[2] + " ("+dataaset[3]+")" );*/
                                     } else {
                                         replyText(event.getReplyToken(), symbol + " tidak ditemukan.");
                                     }
@@ -131,15 +148,31 @@ public class Controller {
         }
         replyText(event.getReplyToken(), "Keyword salah:(");
         }
-    private void replyFlexMessage(String replyToken) {
+    private void replyFlexMessage(String replyToken){
+        replyFlexMessage(replyToken, 1, null);
+    }
+    private void replyFlexMessage(String replyToken, int flextype, ArrayList<String> flexText) {
         try {
             ClassLoader classLoader = getClass().getClassLoader();
-            String flexTemplate = IOUtils.toString(classLoader.getResourceAsStream("flex_message.json"));
-
-            ObjectMapper objectMapper = ModelObjectMapper.createNewObjectMapper();
-            FlexContainer flexContainer = objectMapper.readValue(flexTemplate, FlexContainer.class);
-
-            ReplyMessage replyMessage = new ReplyMessage(replyToken, new FlexMessage("Jadwal UTS", flexContainer));
+            String flexTemplate; FlexContainer flexContainer; ObjectMapper objectMapper; ReplyMessage replyMessage=null;
+            if(flextype==1) {
+                flexTemplate = IOUtils.toString(classLoader.getResourceAsStream("flex_message.json"));
+                objectMapper = ModelObjectMapper.createNewObjectMapper();
+                flexContainer = objectMapper.readValue(flexTemplate, FlexContainer.class);
+                replyMessage = new ReplyMessage(replyToken, new FlexMessage("Jadwal UTS", flexContainer));
+            }else if(flextype==2){
+                flexTemplate = IOUtils.toString(classLoader.getResourceAsStream("flex_stock.json"));
+                flexTemplate = String.format(flexTemplate,
+                                             flexText.get(0),
+                                             flexText.get(1),
+                                             flexText.get(2),
+                                             flexText.get(3),
+                                             flexText.get(4),
+                                             flexText.get(5));
+                objectMapper = ModelObjectMapper.createNewObjectMapper();
+                flexContainer = objectMapper.readValue(flexTemplate, FlexContainer.class);
+                replyMessage = new ReplyMessage(replyToken, new FlexMessage("Performa " + flexText.get(0) + " hari ini", flexContainer));
+            }
             reply(replyMessage);
         } catch (IOException e) {
             throw new RuntimeException(e);
