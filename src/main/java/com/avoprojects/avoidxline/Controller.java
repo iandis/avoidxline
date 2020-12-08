@@ -162,14 +162,9 @@ public class Controller {
                 replyMessage = new ReplyMessage(replyToken, new FlexMessage("Jadwal UTS", flexContainer));
             }else if(flextype==2){
                 flexTemplate = IOUtils.toString(classLoader.getResourceAsStream("flex_stock.json"));
-
-                flexTemplate = String.format(flexTemplate.replaceAll("\"","'"),
-                                             flexText.get(0),
-                                             flexText.get(1),
-                                             flexText.get(2),
-                                             flexText.get(3),
-                                             flexText.get(4),
-                                             flexText.get(5)).replaceAll("'","\"");
+                for(int i=1; i<=6;i++){
+                    flexTemplate=flexTemplate.replaceAll("Text"+i,flexText.get(i-1));
+                }
                 objectMapper = ModelObjectMapper.createNewObjectMapper();
                 flexContainer = objectMapper.readValue(flexTemplate, FlexContainer.class);
                 replyMessage = new ReplyMessage(replyToken, new FlexMessage("Performa " + flexText.get(0) + " hari ini", flexContainer));

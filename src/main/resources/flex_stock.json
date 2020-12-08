@@ -6,7 +6,7 @@
     "contents": [
       {
         "type": "text",
-        "text": "%1$s",
+        "text": "Text1",
         "color": "#FAFAFA",
         "weight": "bold",
         "margin": "none",
@@ -23,7 +23,7 @@
     "contents": [
       {
         "type": "text",
-        "text": "%2$s",
+        "text": "Text2",
         "weight": "bold",
         "size": "xl",
         "margin": "none"
@@ -46,7 +46,7 @@
               },
               {
                 "type": "text",
-                "text": "%3$s"
+                "text": "Text3"
               }
             ]
           },
@@ -63,7 +63,7 @@
               },
               {
                 "type": "text",
-                "text": "%4$s"
+                "text": "Text4"
               }
             ]
           },
@@ -80,8 +80,8 @@
               },
               {
                 "type": "text",
-                "text": "%5$s",
-                "color": "%6$s"
+                "text": "Text5",
+                "color": "Text6"
               }
             ]
           }
