@@ -5,39 +5,30 @@
     "layout": "vertical",
     "contents": [
       {
-        "type": "box",
-        "layout": "vertical",
-        "contents": [
-          {
-            "type": "text",
-            "text": "Profileku",
-            "gravity": "center",
-            "align": "center",
-            "weight": "regular",
-            "margin": "sm",
-            "color": "#EEEEEE"
-          }
-        ],
-        "backgroundColor": "#0D47A1"
-      },
-      {
-        "type": "box",
-        "layout": "vertical",
-        "contents": [
-          {
-            "type": "image",
-            "url": "Text3",
-            "size": "xxl",
-            "aspectRatio": "1:1",
-            "aspectMode": "cover",
-            "gravity": "center",
-            "align": "center"
-          }
-        ],
-        "backgroundColor": "#FAFAFA"
+        "type": "text",
+        "text": "Profileku",
+        "color": "#FAFAFA",
+        "weight": "bold",
+        "align": "center",
+        "gravity": "center"
       }
     ],
-    "paddingAll": "0px"
+    "spacing": "none",
+    "margin": "none",
+    "alignItems": "center",
+    "justifyContent": "center",
+    "paddingAll": "2%"
+  },
+  "hero": {
+    "type": "image",
+    "url": "Text3",
+    "aspectRatio": "1:1",
+    "size": "xxl",
+    "offsetTop": "0px",
+    "align": "center",
+    "gravity": "center",
+    "aspectMode": "cover",
+    "offsetBottom": "0px"
   },
   "body": {
     "type": "box",
@@ -53,13 +44,12 @@
             "contents": [
               {
                 "type": "text",
-                "contents": [],
-                "size": "xl",
-                "wrap": true,
                 "text": "Text1",
                 "color": "#01579B",
-                "weight": "bold",
-                "align": "center"
+                "size": "xl",
+                "align": "center",
+                "gravity": "center",
+                "weight": "bold"
               },
               {
                 "type": "text",
@@ -67,7 +57,8 @@
                 "color": "#212121",
                 "size": "sm",
                 "wrap": true,
-                "align": "center"
+                "align": "center",
+                "gravity": "center"
               }
             ],
             "spacing": "sm"
