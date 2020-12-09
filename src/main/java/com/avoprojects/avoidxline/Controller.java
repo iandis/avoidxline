@@ -4,8 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.linecorp.bot.client.LineMessagingClient;
 import com.linecorp.bot.client.LineSignatureValidator;
 import com.linecorp.bot.client.MessageContentResponse;
-import com.linecorp.bot.model.Multicast;
-import com.linecorp.bot.model.PushMessage;
+//import com.linecorp.bot.model.Multicast;
+//import com.linecorp.bot.model.PushMessage;
 import com.linecorp.bot.model.ReplyMessage;
 import com.linecorp.bot.model.event.FollowEvent;
 import com.linecorp.bot.model.event.JoinEvent;
@@ -109,33 +109,33 @@ public class Controller {
     private void handleTextMessage(MessageEvent event) {
         TextMessageContent textMessageContent = (TextMessageContent) event.getMessage();
         String msg = textMessageContent.getText();
-        for(int i=0;i<keywords.length;i++){
-            if(msg.length()>=keywords[i].length()) {
-                if (msg.toLowerCase().substring(0, keywords[i].length()).equals(keywords[i])) {
-                    String symbol="";
+        for (String keyword : keywords) {
+            if (msg.length() >= keyword.length()) {
+                if (msg.toLowerCase().substring(0, keyword.length()).equals(keyword)) {
+                    String symbol = "";
                     StocksAPI Stocks;
-                    switch (keywords[i]) {
+                    switch (keyword) {
                         case "jadwal uts":
                             replyFlexMessage(event.getReplyToken());
                             return;
                         case "saham":
                             symbol = msg.toUpperCase().substring(6); //misal teks "saham BBCA", berarti memisahkan teks "saham " dengan "BBCA"
-                            Stocks = new StocksAPI(symbol+".JK");
+                            Stocks = new StocksAPI(symbol + ".JK");
                             Stocks.join();
                             String[] dataaset = Stocks.getSingleQuote();
 
                             if (dataaset != null) {
-                                ArrayList<String> dataset = new ArrayList<String>();
+                                ArrayList<String> dataset = new ArrayList<>();
                                 dataset.add(symbol);
                                 dataset.addAll(Arrays.asList(dataaset).subList(0, 4));
-                                if(dataaset[3].contains("+")){
+                                if (dataaset[3].contains("+")) {
                                     dataset.add("#2E7D32");
-                                }else if(dataaset[3].contains("-")){
+                                } else if (dataaset[3].contains("-")) {
                                     dataset.add("#C62828");
-                                }else{
+                                } else {
                                     dataset.add("#000000");
                                 }
-                                replyFlexMessage(event.getReplyToken(),2,dataset);
+                                replyFlexMessage(event.getReplyToken(), 2, dataset);
                             } else {
                                 replyText(event.getReplyToken(), symbol + " tidak ditemukan.");
                             }
@@ -144,19 +144,22 @@ public class Controller {
                             symbol = msg.toLowerCase().substring(7);
                         case "index":
                             try {
-                                if(symbol.equals("")){symbol=msg.toLowerCase().substring(6);}
+                                if (symbol.equals("")) {
+                                    symbol = msg.toLowerCase().substring(6);
+                                }
                                 ClassLoader classLoader = getClass().getClassLoader();
                                 String idx_keys = IOUtils.toString(classLoader.getResourceAsStream("index_keywords.json"));
-                                String idkey="NA";
+                                String idkey = "NA";
                                 JSONObject idxkeys = new JSONObject(idx_keys);
-                                try{
-                                    idkey=idxkeys.getString(symbol);
-                                }catch (Exception ignored){}
+                                try {
+                                    idkey = idxkeys.getString(symbol);
+                                } catch (Exception ignored) {
+                                }
                                 if (!idkey.equals("NA")) {
                                     Stocks = new StocksAPI(idkey);
                                     Stocks.join();
                                     String[] dset = Stocks.getSingleQuote();
-                                    ArrayList<String> dataset = new ArrayList<String>();
+                                    ArrayList<String> dataset = new ArrayList<>();
                                     dataset.add(symbol.toUpperCase());
                                     dataset.addAll(Arrays.asList(dset).subList(0, 4));
                                     if (dset[3].contains("+")) {
@@ -170,38 +173,39 @@ public class Controller {
                                 } else {
                                     replyText(event.getReplyToken(), symbol + " tidak ditemukan.");
                                 }
-                            }catch(Exception ignored){}
+                            } catch (Exception ignored) {
+                            }
                             return;
                         case "profileku":
                             UserProfileResponse profile = getProfile(event.getSource().getUserId());
-                            String dispName=profile.getDisplayName();
-                            String userStatus="Yuk Nabung Saham!";
-                            String picUrl=profile.getPictureUrl();
-                            ArrayList<String> user = new ArrayList<String>();
+                            String dispName = profile.getDisplayName();
+                            String userStatus = "Yuk Nabung Saham!";
+                            String picUrl = profile.getPictureUrl();
+                            ArrayList<String> user = new ArrayList<>();
                             user.add(dispName);
                             user.add(userStatus);
                             user.add(picUrl);
-                            replyFlexMessage(event.getReplyToken(),3,user);
+                            replyFlexMessage(event.getReplyToken(), 3, user);
                             return;
                         case "edit profile":
-                            if(event.getSource() instanceof GroupSource || event.getSource() instanceof RoomSource){
-                                replyText(event.getReplyToken(),"Duh maaf Avo gak bisa bantu edit profile kamu disini:(");
-                            }else{
+                            if (event.getSource() instanceof GroupSource || event.getSource() instanceof RoomSource) {
+                                replyText(event.getReplyToken(), "Duh maaf Avo gak bisa bantu edit profile kamu disini:(");
+                            } else {
                                 List<String> multimsg = new ArrayList<>();
                                 multimsg.add(
-                                                "Tulis nama & status yang mau kamu ubah ya.\n" +
+                                        "Tulis nama & status yang mau kamu ubah ya.\n" +
                                                 "Formatnya:\n");
                                 multimsg.add(
-                                                "+nama Namabaru\n" +
+                                        "+nama Namabaru\n" +
                                                 "+status Statusbaru\n");
-                                multimsg.add(   "Untuk bagian yang gak ingin kamu ganti, cukup isi dengan \"##\" aja ya. Misalnya: nama ##");
+                                multimsg.add("Untuk bagian yang gak ingin kamu ganti, cukup isi dengan \"##\" aja ya. Misalnya: nama ##");
                                 replyMultiMsg(event.getReplyToken(), multimsg);
                             }
                             return;
                         case "+nama":
-                            if(event.getSource() instanceof GroupSource || event.getSource() instanceof RoomSource){
-                                replyText(event.getReplyToken(),"Duh maaf Avo gak bisa bantu edit profile kamu disini:(");
-                            }else {
+                            if (event.getSource() instanceof GroupSource || event.getSource() instanceof RoomSource) {
+                                replyText(event.getReplyToken(), "Duh maaf Avo gak bisa bantu edit profile kamu disini:(");
+                            } else {
                                 if (msg.contains("\n+status")) {
                                     String nama = msg.substring(6, msg.indexOf("\n+status"));
                                     String status = msg.substring(msg.indexOf("+status ") + 8);
@@ -217,25 +221,25 @@ public class Controller {
                                 } else {
                                     List<String> multimsg = new ArrayList<>();
                                     multimsg.add(
-                                                    "Aduh formatnya salah nih:(\n" +
+                                            "Aduh formatnya salah nih:(\n" +
                                                     "Formatnya:\n");
                                     multimsg.add(
-                                                    "+nama Namabaru\n" +
+                                            "+nama Namabaru\n" +
                                                     "+status Statusbaru\n");
-                                    multimsg.add(   "Untuk bagian yang gak ingin kamu ganti, cukup isi dengan \"##\" aja ya. Misalnya: nama ##");
+                                    multimsg.add("Untuk bagian yang gak ingin kamu ganti, cukup isi dengan \"##\" aja ya. Misalnya: nama ##");
                                     replyMultiMsg(event.getReplyToken(), multimsg);
                                 }
                             }
                             return;
                         case "-leave":
-                            if(event.getSource() instanceof GroupSource) {
-                                replyText(event.getReplyToken(),"Yah:( Yaudah deh kalo gitu Avo pamit dulu ya.");
+                            if (event.getSource() instanceof GroupSource) {
+                                replyText(event.getReplyToken(), "Yah:( Yaudah deh kalo gitu Avo pamit dulu ya.");
                                 leaveGroup(event.getSource().getSenderId());
-                            }else if(event.getSource() instanceof RoomSource){
-                                replyText(event.getReplyToken(),"Yah:( Yaudah deh kalo gitu Avo pamit dulu ya.");
+                            } else if (event.getSource() instanceof RoomSource) {
+                                replyText(event.getReplyToken(), "Yah:( Yaudah deh kalo gitu Avo pamit dulu ya.");
                                 leaveRoom(event.getSource().getSenderId());
-                            }else{
-                                replyText(event.getReplyToken(),"Duh jangan usir Avo dong:(");
+                            } else {
+                                replyText(event.getReplyToken(), "Duh jangan usir Avo dong:(");
                             }
                             return;
                     }
@@ -303,68 +307,68 @@ public class Controller {
             throw new RuntimeException(e);
         }
     }
-    @RequestMapping(value="/pushmessage/{id}/{message}", method=RequestMethod.GET)
-    public ResponseEntity<String> pushmessage(
-            @PathVariable("id") String userId,
-            @PathVariable("message") String textMsg
-    ){
-        TextMessage textMessage = new TextMessage(textMsg);
-        PushMessage pushMessage = new PushMessage(userId, textMessage);
-        push(pushMessage);
-
-        return new ResponseEntity<String>("Push message:"+textMsg+"\nsent to: "+userId, HttpStatus.OK);
-    }
-    private void push(PushMessage pushMessage){
-        try {
-            lineMessagingClient.pushMessage(pushMessage).get();
-        } catch (InterruptedException | ExecutionException e) {
-            throw new RuntimeException(e);
-        }
-    }
-    @RequestMapping(value="/multicast", method=RequestMethod.GET)
-    public ResponseEntity<String> multicast(
-            /*@PathVariable("id")*/ String[] userIdList,
-                                    String textMsg
-    ){
-        /*String[] userIdList = {
-                "U206d25c2ea6bd87c17655609xxxxxxxx",
-                "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
-                "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
-                "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
-                "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"};*/
-        Set<String> listUsers = new HashSet<String>(Arrays.asList(userIdList));
-        if(listUsers.size() > 0){
-            //String textMsg = "Ini pesan multicast";
-            sendMulticast(listUsers, textMsg);
-        }
-        return new ResponseEntity<String>(HttpStatus.OK);
-    }
-    private void sendMulticast(Set<String> sourceUsers, String txtMessage){
-        TextMessage message = new TextMessage(txtMessage);
-        Multicast multicast = new Multicast(sourceUsers, message);
-
-        try {
-            lineMessagingClient.multicast(multicast).get();
-        } catch (InterruptedException | ExecutionException e) {
-            throw new RuntimeException(e);
-        }
-    }
-    @RequestMapping(value = "/profile/{id}", method = RequestMethod.GET)
-    public ResponseEntity<String> profile(
-            @PathVariable("id") String userId
-    ){
-        UserProfileResponse profile = getProfile(userId);
-
-        if (profile != null) {
-            String profileName = profile.getDisplayName();
-            TextMessage textMessage = new TextMessage("Hello, " + profileName);
-            PushMessage pushMessage = new PushMessage(userId, textMessage);
-            push(pushMessage);
-
-            return new ResponseEntity<String>("Hello, "+profileName, HttpStatus.OK);
-        }
-        return new ResponseEntity<String>(HttpStatus.NOT_FOUND);
-    }
+//    @RequestMapping(value="/pushmessage/{id}/{message}", method=RequestMethod.GET)
+//    public ResponseEntity<String> pushmessage(
+//            @PathVariable("id") String userId,
+//            @PathVariable("message") String textMsg
+//    ){
+//        TextMessage textMessage = new TextMessage(textMsg);
+//        PushMessage pushMessage = new PushMessage(userId, textMessage);
+//        push(pushMessage);
+//
+//        return new ResponseEntity<String>("Push message:"+textMsg+"\nsent to: "+userId, HttpStatus.OK);
+//    }
+//    private void push(PushMessage pushMessage){
+//        try {
+//            lineMessagingClient.pushMessage(pushMessage).get();
+//        } catch (InterruptedException | ExecutionException e) {
+//            throw new RuntimeException(e);
+//        }
+//    }
+//    @RequestMapping(value="/multicast", method=RequestMethod.GET)
+//    public ResponseEntity<String> multicast(
+//            /*@PathVariable("id")*/ String[] userIdList,
+//                                    String textMsg
+//    ){
+//        /*String[] userIdList = {
+//                "U206d25c2ea6bd87c17655609xxxxxxxx",
+//                "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+//                "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+//                "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+//                "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"};*/
+//        Set<String> listUsers = new HashSet<String>(Arrays.asList(userIdList));
+//        if(listUsers.size() > 0){
+//            //String textMsg = "Ini pesan multicast";
+//            sendMulticast(listUsers, textMsg);
+//        }
+//        return new ResponseEntity<String>(HttpStatus.OK);
+//    }
+//    private void sendMulticast(Set<String> sourceUsers, String txtMessage){
+//        TextMessage message = new TextMessage(txtMessage);
+//        Multicast multicast = new Multicast(sourceUsers, message);
+//
+//        try {
+//            lineMessagingClient.multicast(multicast).get();
+//        } catch (InterruptedException | ExecutionException e) {
+//            throw new RuntimeException(e);
+//        }
+//    }
+//    @RequestMapping(value = "/profile/{id}", method = RequestMethod.GET)
+//    public ResponseEntity<String> profile(
+//            @PathVariable("id") String userId
+//    ){
+//        UserProfileResponse profile = getProfile(userId);
+//
+//        if (profile != null) {
+//            String profileName = profile.getDisplayName();
+//            TextMessage textMessage = new TextMessage("Hello, " + profileName);
+//            PushMessage pushMessage = new PushMessage(userId, textMessage);
+//            push(pushMessage);
+//
+//            return new ResponseEntity<String>("Hello, "+profileName, HttpStatus.OK);
+//        }
+//        return new ResponseEntity<String>(HttpStatus.NOT_FOUND);
+//    }
     private UserProfileResponse getProfile(String userId){
         try {
             return lineMessagingClient.getProfile(userId).get();
@@ -393,13 +397,13 @@ public class Controller {
     }
     private void replyMultiMsg(String replyToken, List<String> msg) {
         List<Message> msgArray = new ArrayList<>();
-        for(int i=0;i<msg.size();i++){
-            msgArray.add(new TextMessage(msg.get(i));
+        for (String s : msg) {
+            msgArray.add(new TextMessage(s));
         }
         ReplyMessage replyMessage = new ReplyMessage(replyToken, msgArray);
         reply(replyMessage);
     }
-    public void leaveGroup(String groupId) {
+    private void leaveGroup(String groupId) {
         try {
             lineMessagingClient.leaveGroup(groupId).get();
         } catch (InterruptedException | ExecutionException e) {
@@ -407,7 +411,7 @@ public class Controller {
         }
     }
 
-    public void leaveRoom(String groupId) {
+    private void leaveRoom(String groupId) {
         try {
             lineMessagingClient.leaveGroup(groupId).get();
         } catch (InterruptedException | ExecutionException e) {
