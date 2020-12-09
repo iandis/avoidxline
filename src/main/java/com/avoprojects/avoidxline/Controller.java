@@ -140,10 +140,10 @@ public class Controller {
                             }
                             return;
                         case "indeks":
-                            symbol = textMessageContent.getText().toUpperCase().substring(7);
+                            symbol = textMessageContent.getText().toLowerCase().substring(7);
                         case "index":
                             try {
-                                if(symbol.equals("")){symbol=textMessageContent.getText().toUpperCase().substring(6);}
+                                if(symbol.equals("")){symbol=textMessageContent.getText().toLowerCase().substring(6);}
                                 ClassLoader classLoader = getClass().getClassLoader();
                                 String idx_keys = IOUtils.toString(classLoader.getResourceAsStream("index_keywords.json"));
                                 String idkey="NA";
@@ -156,7 +156,7 @@ public class Controller {
                                     Stocks.join();
                                     String[] dset = Stocks.getSingleQuote();
                                     ArrayList<String> dataset = new ArrayList<String>();
-                                    dataset.add(symbol);
+                                    dataset.add(symbol.toUpperCase());
                                     dataset.addAll(Arrays.asList(dset).subList(0, 4));
                                     if (dset[3].contains("+")) {
                                         dataset.add("#2E7D32");
@@ -165,7 +165,7 @@ public class Controller {
                                     } else {
                                         dataset.add("#000000");
                                     }
-                                    replyFlexMessage(event.getReplyToken(), 3, dataset);
+                                    replyFlexMessage(event.getReplyToken(), 2, dataset);
                                 } else {
                                     replyText(event.getReplyToken(), symbol + " tidak ditemukan.");
                                 }
