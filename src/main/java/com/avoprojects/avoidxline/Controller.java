@@ -272,7 +272,9 @@ public class Controller {
                 }
             }
         }
-        if(!(event.getSource() instanceof GroupSource) || !(event.getSource() instanceof RoomSource)) {
+        if((event.getSource() instanceof GroupSource) || (event.getSource() instanceof RoomSource)) {
+            //
+        }else{
             replyText(event.getReplyToken(), "Keyword salah:(");
         }
     }
