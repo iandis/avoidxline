@@ -17,7 +17,8 @@
     "margin": "none",
     "alignItems": "center",
     "justifyContent": "center",
-    "paddingAll": "2%"
+    "paddingBottom": "1%",
+    "paddingTop": "1%"
   },
   "hero": {
     "type": "image",
@@ -39,34 +40,28 @@
         "layout": "vertical",
         "contents": [
           {
-            "type": "box",
-            "layout": "vertical",
-            "contents": [
-              {
-                "type": "text",
-                "text": "Text1",
-                "color": "#01579B",
-                "size": "xl",
-                "align": "center",
-                "gravity": "center",
-                "weight": "bold"
-              },
-              {
-                "type": "text",
-                "text": "Text2",
-                "color": "#212121",
-                "size": "sm",
-                "wrap": true,
-                "align": "center",
-                "gravity": "center"
-              }
-            ],
-            "spacing": "sm"
+            "type": "text",
+            "text": "Text1",
+            "color": "#01579B",
+            "size": "xl",
+            "align": "center",
+            "gravity": "center",
+            "weight": "bold"
+          },
+          {
+            "type": "text",
+            "text": "Text2",
+            "color": "#212121",
+            "size": "sm",
+            "wrap": true,
+            "align": "center",
+            "gravity": "center"
           }
         ]
       }
     ],
-    "paddingAll": "20px"
+    "paddingTop": "2%",
+    "paddingBottom": "4%"
   },
   "footer": {
     "type": "box",
