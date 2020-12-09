@@ -1,0 +1,121 @@
+{
+  "type": "bubble",
+  "header": {
+    "type": "box",
+    "layout": "vertical",
+    "contents": [
+      {
+        "type": "box",
+        "layout": "vertical",
+        "contents": [
+          {
+            "type": "text",
+            "text": "Profileku",
+            "gravity": "center",
+            "align": "center",
+            "weight": "regular",
+            "margin": "sm",
+            "color": "#FFFFFF"
+          }
+        ],
+        "backgroundColor": "#0D47A1"
+      },
+      {
+        "type": "box",
+        "layout": "vertical",
+        "contents": [
+          {
+            "type": "image",
+            "url": "Text3",
+            "size": "xxl",
+            "aspectRatio": "1:1",
+            "aspectMode": "cover",
+            "gravity": "center",
+            "margin": "none"
+          }
+        ],
+        "backgroundColor": "#FAFAFA"
+      }
+    ],
+    "paddingAll": "0px"
+  },
+  "body": {
+    "type": "box",
+    "layout": "vertical",
+    "contents": [
+      {
+        "type": "box",
+        "layout": "vertical",
+        "contents": [
+          {
+            "type": "box",
+            "layout": "vertical",
+            "contents": [
+              {
+                "type": "text",
+                "contents": [],
+                "size": "xl",
+                "wrap": true,
+                "text": "Text1",
+                "color": "#01579B",
+                "weight": "bold",
+                "align": "center"
+              },
+              {
+                "type": "text",
+                "text": "Text2",
+                "color": "#212121",
+                "size": "sm",
+                "wrap": true,
+                "align": "center"
+              }
+            ],
+            "spacing": "sm"
+          }
+        ]
+      }
+    ],
+    "paddingAll": "20px"
+  },
+  "footer": {
+    "type": "box",
+    "layout": "vertical",
+    "contents": [
+      {
+        "type": "button",
+        "action": {
+          "type": "message",
+          "label": "Portofolio",
+          "text": "portofolio"
+        },
+        "color": "#2196F3",
+        "height": "sm"
+      },
+      {
+        "type": "button",
+        "action": {
+          "type": "message",
+          "label": "Watchlist",
+          "text": "watchlist"
+        },
+        "color": "#2196F3",
+        "height": "sm"
+      },
+      {
+        "type": "button",
+        "action": {
+          "type": "message",
+          "label": "Edit Profileku",
+          "text": "edit profile"
+        },
+        "height": "sm",
+        "color": "#2196F3"
+      }
+    ]
+  },
+  "styles": {
+    "body": {
+      "backgroundColor": "#EEEEEE"
+    }
+  }
+}

@@ -20,6 +20,7 @@ import com.linecorp.bot.model.objectmapper.ModelObjectMapper;
 import com.linecorp.bot.model.profile.UserProfileResponse;
 import org.apache.commons.io.IOUtils;
 
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.io.InputStreamResource;
@@ -33,8 +34,7 @@ import java.io.InputStream;
 
 @RestController
 public class Controller {
-    private static String[] keywords=new String[]{"jadwal uts","saham"};
-
+    private static String[] keywords=new String[]{"jadwal uts","saham","indeks","index","profileku"};
     @Autowired
     @Qualifier("lineMessagingClient")
     private LineMessagingClient lineMessagingClient;
@@ -111,37 +111,76 @@ public class Controller {
         for(int i=0;i<keywords.length;i++){
             if(textMessageContent.getText().length()>=keywords[i].length()) {
                 if (textMessageContent.getText().toLowerCase().substring(0, keywords[i].length()).equals(keywords[i])) {
+                    String symbol="";
+                    StocksAPI Stocks;
                     switch (keywords[i]) {
                         case "jadwal uts":
                             replyFlexMessage(event.getReplyToken());
                             return;
                         case "saham":
-                                    String symbol = textMessageContent.getText().toUpperCase().substring(6); //misal teks "saham BBCA", berarti memisahkan teks "saham " dengan "BBCA"
-                                    StocksAPI Stocks = new StocksAPI(symbol+".JK");
+                            symbol = textMessageContent.getText().toUpperCase().substring(6); //misal teks "saham BBCA", berarti memisahkan teks "saham " dengan "BBCA"
+                            Stocks = new StocksAPI(symbol+".JK");
+                            Stocks.join();
+                            String[] dataaset = Stocks.getSingleQuote();
+                            if (dataaset != null) {
+                                ArrayList<String> dataset = new ArrayList<String>();
+                                dataset.add(symbol);
+                                dataset.addAll(Arrays.asList(dataaset).subList(0, 4));
+                                if(dataaset[3].contains("+")){
+                                    dataset.add("#2E7D32");
+                                }else if(dataaset[3].contains("-")){
+                                    dataset.add("#C62828");
+                                }else{
+                                    dataset.add("#000000");
+                                }
+                                replyFlexMessage(event.getReplyToken(),2,dataset);
+                            } else {
+                                replyText(event.getReplyToken(), symbol + " tidak ditemukan.");
+                            }
+                            return;
+                        case "indeks":
+                            symbol = textMessageContent.getText().toUpperCase().substring(7);
+                        case "index":
+                            try {
+                                if(symbol.equals("")){symbol=textMessageContent.getText().toUpperCase().substring(6);}
+                                ClassLoader classLoader = getClass().getClassLoader();
+                                String idx_keys = IOUtils.toString(classLoader.getResourceAsStream("index_keywords.json"));
+                                String idkey="NA";
+                                JSONObject idxkeys = new JSONObject(idx_keys);
+                                try{
+                                    idkey=idxkeys.getString(symbol);
+                                }catch (Exception ignored){}
+                                if (!idkey.equals("NA")) {
+                                    Stocks = new StocksAPI(idkey);
                                     Stocks.join();
-                                    String[] dataaset = Stocks.getSingleQuote();
-                                    if (dataaset != null) {
-                                        ArrayList<String> dataset = new ArrayList<String>();
-                                        dataset.add(symbol);
-                                        for(int j=0;j<4;j++) {
-                                            dataset.add(dataaset[j]);
-                                        }
-                                        if(dataaset[3].contains("+")){
-                                            dataset.add("#2E7D32");
-                                        }else if(dataaset[3].contains("-")){
-                                            dataset.add("#C62828");
-                                        }else{
-                                            dataset.add("#000000");
-                                        }
-                                        replyFlexMessage(event.getReplyToken(),2,dataset);
-                                        /*replyText(event.getReplyToken(), dataaset[0] +
-                                                " ("+symbol+")\n"
-                                                + dataaset[1] + "\n"
-                                                + dataaset[2] + " ("+dataaset[3]+")" );*/
+                                    String[] dset = Stocks.getSingleQuote();
+                                    ArrayList<String> dataset = new ArrayList<String>();
+                                    dataset.add(symbol);
+                                    dataset.addAll(Arrays.asList(dset).subList(0, 4));
+                                    if (dset[3].contains("+")) {
+                                        dataset.add("#2E7D32");
+                                    } else if (dset[3].contains("-")) {
+                                        dataset.add("#C62828");
                                     } else {
-                                        replyText(event.getReplyToken(), symbol + " tidak ditemukan.");
+                                        dataset.add("#000000");
                                     }
-                                    return;
+                                    replyFlexMessage(event.getReplyToken(), 2, dataset);
+                                } else {
+                                    replyText(event.getReplyToken(), symbol + " tidak ditemukan.");
+                                }
+                            }catch(Exception ignored){}
+                            return;
+                        case "profileku":
+                            String userId = event.getSource().getUserId();
+                            UserProfileResponse profile = getProfile(userId);
+                            String dispName=profile.getDisplayName();
+                            String userStatus="Yuk Nabung Saham!";
+                            String picUrl=profile.getPictureUrl();
+                            ArrayList<String> user = new ArrayList<String>();
+                            user.add(dispName);
+                            user.add(userStatus);
+                            user.add(picUrl);
+                            replyFlexMessage(event.getReplyToken(),3,user);
                     }
                 }
             }
@@ -153,11 +192,12 @@ public class Controller {
     }
     private void replyFlexMessage(String replyToken, int flextype, ArrayList<String> flexText) {
         try {
+            //1: Jadwal UTS, 2: Stock, 3: Profile
             ClassLoader classLoader = getClass().getClassLoader();
-            String flexTemplate; FlexContainer flexContainer; ObjectMapper objectMapper; ReplyMessage replyMessage=null;
+            String flexTemplate; FlexContainer flexContainer; ReplyMessage replyMessage=null;
+            ObjectMapper objectMapper = ModelObjectMapper.createNewObjectMapper();
             if(flextype==1) {
-                flexTemplate = IOUtils.toString(classLoader.getResourceAsStream("flex_message.json"));
-                objectMapper = ModelObjectMapper.createNewObjectMapper();
+                flexTemplate = IOUtils.toString(classLoader.getResourceAsStream("flex_jadwaluts.json"));
                 flexContainer = objectMapper.readValue(flexTemplate, FlexContainer.class);
                 replyMessage = new ReplyMessage(replyToken, new FlexMessage("Jadwal UTS", flexContainer));
             }else if(flextype==2){
@@ -165,9 +205,15 @@ public class Controller {
                 for(int i=1; i<=6;i++){
                     flexTemplate=flexTemplate.replaceAll("Text"+i,flexText.get(i-1));
                 }
-                objectMapper = ModelObjectMapper.createNewObjectMapper();
                 flexContainer = objectMapper.readValue(flexTemplate, FlexContainer.class);
                 replyMessage = new ReplyMessage(replyToken, new FlexMessage("Performa " + flexText.get(0) + " hari ini", flexContainer));
+            }else if(flextype==3){
+                flexTemplate = IOUtils.toString(classLoader.getResourceAsStream("flex_profile.json"));
+                for(int i=1; i<=3;i++){
+                    flexTemplate=flexTemplate.replaceAll("Text"+i,flexText.get(i-1));
+                }
+                flexContainer = objectMapper.readValue(flexTemplate, FlexContainer.class);
+                replyMessage = new ReplyMessage(replyToken, new FlexMessage("Profileku", flexContainer));
             }
             reply(replyMessage);
         } catch (IOException e) {

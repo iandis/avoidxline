@@ -74,8 +74,12 @@ class StocksAPI implements Runnable {
                 double mPrice = yfresult.getDouble("regularMarketPrice");
                 double mChange = yfresult.getDouble("regularMarketChange");
                 double mChangep = yfresult.getDouble("regularMarketChangePercent");
-                double mMarketcap = yfresult.getDouble("marketCap");
-                marketCap = formatMarketCap(mMarketcap);
+                try {
+                    double mMarketcap = yfresult.getDouble("marketCap");
+                    marketCap = formatMarketCap(mMarketcap);
+                }catch(Exception e){
+                    marketCap = "N/A";
+                }
                 price = String.format("%.2f",mPrice);
                 change = String.format(mChange > 0 ? "+%.2f" : "%.2f",mChange);
                 changep = String.format(mChangep > 0 ? "+%.2f%%" : "%.2f%%",mChangep);
