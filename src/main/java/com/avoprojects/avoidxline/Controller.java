@@ -122,6 +122,7 @@ public class Controller {
                             Stocks = new StocksAPI(symbol+".JK");
                             Stocks.join();
                             String[] dataaset = Stocks.getSingleQuote();
+
                             if (dataaset != null) {
                                 ArrayList<String> dataset = new ArrayList<String>();
                                 dataset.add(symbol);
