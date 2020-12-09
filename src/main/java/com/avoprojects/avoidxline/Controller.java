@@ -193,11 +193,11 @@ public class Controller {
                             } else {
                                 List<String> multimsg = new ArrayList<>();
                                 multimsg.add(
-                                        "Tulis nama & status yang mau kamu ubah ya.\n" +
-                                                "Formatnya:\n");
+                                                "Tulis nama & status yang mau kamu ubah ya.\n" +
+                                                "Formatnya:");
                                 multimsg.add(
-                                        "+nama Namabaru\n" +
-                                                "+status Statusbaru\n");
+                                                "+nama Namabaru\n" +
+                                                "+status Statusbaru");
                                 multimsg.add("Untuk bagian yang gak ingin kamu ganti, cukup isi dengan \"##\" aja ya. Misalnya: nama ##");
                                 replyMultiMsg(event.getReplyToken(), multimsg);
                             }
@@ -210,22 +210,24 @@ public class Controller {
                                     String nama = msg.substring(6, msg.indexOf("\n+status"));
                                     String status = msg.substring(msg.indexOf("+status ") + 8);
                                     if (!nama.equals("##") && !status.equals("##")) {
-                                        replyText(event.getReplyToken(), "Sukses ganti nama menjadi " + nama + "\ndan status menjadi " + status);
+                                        System.out.println("Sukses ganti nama menjadi " + nama + "\ndan status menjadi " + status);
                                     } else if (!nama.equals("##")) {
-                                        replyText(event.getReplyToken(), "Sukses ganti status menjadi " + status);
+                                        System.out.println("Sukses ganti nama menjadi " + nama);
                                     } else if (!status.equals("##")) {
-                                        replyText(event.getReplyToken(), "Sukses ganti nama menjadi " + nama);
+                                        System.out.println("Sukses ganti status menjadi " + status);
+                                    } else if (nama.equals("##") && status.equals("##")) {
+                                        System.out.println("Sukses gak ganti apa-apa:)");
                                     } else {
-                                        replyText(event.getReplyToken(), "Yah sepertinya ada yang salah dengan Avo:(");
+                                        System.out.println("Yah sepertinya ada yang salah dengan Avo:(");
                                     }
                                 } else {
                                     List<String> multimsg = new ArrayList<>();
                                     multimsg.add(
                                             "Aduh formatnya salah nih:(\n" +
-                                                    "Formatnya:\n");
+                                                    "Formatnya:");
                                     multimsg.add(
                                             "+nama Namabaru\n" +
-                                                    "+status Statusbaru\n");
+                                                    "+status Statusbaru");
                                     multimsg.add("Untuk bagian yang gak ingin kamu ganti, cukup isi dengan \"##\" aja ya. Misalnya: nama ##");
                                     replyMultiMsg(event.getReplyToken(), multimsg);
                                 }

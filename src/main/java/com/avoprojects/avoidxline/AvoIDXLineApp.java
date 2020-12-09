@@ -22,11 +22,20 @@ public class AvoIDXLineApp {
 		}
 	}
 	public static void main(String[] args) {
-		/*String teks = "+nama Iandi Santulus\n+status Yuk Nabung";
-		String nama = teks.substring(6,teks.indexOf("\n+status"));
-		String status = teks.substring(teks.indexOf("+status ")+8);
-		System.out.println(nama);
-		System.out.println(status);*/
+//		String teks = "+nama Iandi\n+status Anjay";
+//		String nama = teks.substring(6,teks.indexOf("\n+status"));
+//		String status = teks.substring(teks.indexOf("+status ")+8);
+//		if (!nama.equals("##") && !status.equals("##")) {
+//			System.out.println("Sukses ganti nama menjadi " + nama + "\ndan status menjadi " + status);
+//		} else if (!nama.equals("##")) {
+//			System.out.println("Sukses ganti nama menjadi " + nama);
+//		} else if (!status.equals("##")) {
+//			System.out.println("Sukses ganti status menjadi " + status);
+//		} else if (nama.equals("##") && status.equals("##")) {
+//			System.out.println("Sukses gak ganti apa-apa:)");
+//		} else {
+//			System.out.println("Yah sepertinya ada yang salah dengan Avo:(");
+//		}
 		SpringApplication.run(AvoIDXLineApp.class, args);
 	}
 
