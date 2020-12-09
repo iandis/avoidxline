@@ -35,7 +35,12 @@ import java.io.InputStream;
 
 @RestController
 public class Controller {
-    private static String[] keywords=new String[]{"jadwal uts","saham","indeks","index","profileku","edit profile","+nama","-leave"};
+    private static String[] keywords=new String[]{
+            "jadwal uts","saham",
+            "indeks","index",
+            "profileku","edit profile",
+            "+nama","+status",
+            "-leave"};
     @Autowired
     @Qualifier("lineMessagingClient")
     private LineMessagingClient lineMessagingClient;
@@ -210,15 +215,15 @@ public class Controller {
                                     String nama = msg.substring(6, msg.indexOf("\n+status"));
                                     String status = msg.substring(msg.indexOf("+status ") + 8);
                                     if (!nama.equals("##") && !status.equals("##")) {
-                                        System.out.println("Sukses ganti nama menjadi " + nama + "\ndan status menjadi " + status);
+                                        replyText(event.getReplyToken(),"Sukses ganti nama menjadi " + nama + "\ndan status menjadi " + status);
                                     } else if (!nama.equals("##")) {
-                                        System.out.println("Sukses ganti nama menjadi " + nama);
+                                        replyText(event.getReplyToken(),"Sukses ganti nama menjadi " + nama);
                                     } else if (!status.equals("##")) {
-                                        System.out.println("Sukses ganti status menjadi " + status);
+                                        replyText(event.getReplyToken(),"Sukses ganti status menjadi " + status);
                                     } else if (nama.equals("##") && status.equals("##")) {
-                                        System.out.println("Sukses gak ganti apa-apa:)");
+                                        replyText(event.getReplyToken(),"Sukses gak ganti apa-apa:)");
                                     } else {
-                                        System.out.println("Yah sepertinya ada yang salah dengan Avo:(");
+                                        replyText(event.getReplyToken(),"Yah sepertinya ada yang salah dengan Avo:(");
                                     }
                                 } else {
                                     List<String> multimsg = new ArrayList<>();
@@ -233,6 +238,20 @@ public class Controller {
                                 }
                             }
                             return;
+                        case "+status":
+                            if (event.getSource() instanceof GroupSource || event.getSource() instanceof RoomSource) {
+                                replyText(event.getReplyToken(), "Duh maaf Avo gak bisa bantu edit profile kamu disini:(");
+                            } else {
+                                List<String> multimsg = new ArrayList<>();
+                                multimsg.add(
+                                        "Aduh formatnya salah nih:(\n" +
+                                                "Formatnya:");
+                                multimsg.add(
+                                        "+nama Namabaru\n" +
+                                                "+status Statusbaru");
+                                multimsg.add("Untuk bagian yang gak ingin kamu ganti, cukup isi dengan \"##\" aja ya. Misalnya: nama ##");
+                                replyMultiMsg(event.getReplyToken(), multimsg);
+                            }
                         case "-leave":
                             if (event.getSource() instanceof GroupSource) {
                                 replyText(event.getReplyToken(), "Yah:( Yaudah deh kalo gitu Avo pamit dulu ya.");
