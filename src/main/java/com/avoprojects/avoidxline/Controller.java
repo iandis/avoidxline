@@ -34,11 +34,10 @@ import java.io.InputStream;
 
 @RestController
 public class Controller {
-    private static String[] keywords=new String[]{"jadwal uts","saham","indeks","index","profileku"};
+    private static String[] keywords=new String[]{"jadwal uts","saham","indeks","index","profileku","edit profile","+nama"};
     @Autowired
     @Qualifier("lineMessagingClient")
     private LineMessagingClient lineMessagingClient;
-
     @Autowired
     @Qualifier("lineSignatureValidator")
     private LineSignatureValidator lineSignatureValidator;
@@ -74,6 +73,7 @@ public class Controller {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
+
     private void handleOneOnOneChats(MessageEvent event) {
         if  (event.getMessage() instanceof AudioMessageContent
                 || event.getMessage() instanceof ImageMessageContent
@@ -88,12 +88,11 @@ public class Controller {
         }
     }
     private void handleGroupRoomChats(MessageEvent event) {
-        if(!event.getSource().getUserId().isEmpty()) {
-            String userId = event.getSource().getUserId();
-            UserProfileResponse profile = getProfile(userId);
-            replyText(event.getReplyToken(), "Hello, " + profile.getDisplayName());
+        String senderId   = event.getSource().getSenderId();
+        if(senderId!=null) {
+            handleTextMessage(event);
         } else {
-            replyText(event.getReplyToken(), "Hello, what is your name?");
+            replyText(event.getReplyToken(), "Hai, tambahin Avo dulu dong jadi teman kamu:(");
         }
     }
     private void handleContentMessage(MessageEvent event) {
@@ -108,9 +107,10 @@ public class Controller {
     }
     private void handleTextMessage(MessageEvent event) {
         TextMessageContent textMessageContent = (TextMessageContent) event.getMessage();
+        String msg = textMessageContent.getText();
         for(int i=0;i<keywords.length;i++){
-            if(textMessageContent.getText().length()>=keywords[i].length()) {
-                if (textMessageContent.getText().toLowerCase().substring(0, keywords[i].length()).equals(keywords[i])) {
+            if(msg.length()>=keywords[i].length()) {
+                if (msg.toLowerCase().substring(0, keywords[i].length()).equals(keywords[i])) {
                     String symbol="";
                     StocksAPI Stocks;
                     switch (keywords[i]) {
@@ -118,7 +118,7 @@ public class Controller {
                             replyFlexMessage(event.getReplyToken());
                             return;
                         case "saham":
-                            symbol = textMessageContent.getText().toUpperCase().substring(6); //misal teks "saham BBCA", berarti memisahkan teks "saham " dengan "BBCA"
+                            symbol = msg.toUpperCase().substring(6); //misal teks "saham BBCA", berarti memisahkan teks "saham " dengan "BBCA"
                             Stocks = new StocksAPI(symbol+".JK");
                             Stocks.join();
                             String[] dataaset = Stocks.getSingleQuote();
@@ -140,10 +140,10 @@ public class Controller {
                             }
                             return;
                         case "indeks":
-                            symbol = textMessageContent.getText().toLowerCase().substring(7);
+                            symbol = msg.toLowerCase().substring(7);
                         case "index":
                             try {
-                                if(symbol.equals("")){symbol=textMessageContent.getText().toLowerCase().substring(6);}
+                                if(symbol.equals("")){symbol=msg.toLowerCase().substring(6);}
                                 ClassLoader classLoader = getClass().getClassLoader();
                                 String idx_keys = IOUtils.toString(classLoader.getResourceAsStream("index_keywords.json"));
                                 String idkey="NA";
@@ -172,8 +172,7 @@ public class Controller {
                             }catch(Exception ignored){}
                             return;
                         case "profileku":
-                            String userId = event.getSource().getUserId();
-                            UserProfileResponse profile = getProfile(userId);
+                            UserProfileResponse profile = getProfile(event.getSource().getUserId());
                             String dispName=profile.getDisplayName();
                             String userStatus="Yuk Nabung Saham!";
                             String picUrl=profile.getPictureUrl();
@@ -182,6 +181,39 @@ public class Controller {
                             user.add(userStatus);
                             user.add(picUrl);
                             replyFlexMessage(event.getReplyToken(),3,user);
+                            return;
+                        case "edit profile":
+                            if(event.getSource() instanceof GroupSource || event.getSource() instanceof RoomSource){
+                                replyText(event.getReplyToken(),"Duh maaf Avo gak bisa bantu edit profile kamu disini:(");
+                            }else{
+                                replyText(event.getReplyToken(),"Tulis nama & status yang mau kamu ubah ya.\n" +
+                                                                              "Formatnya:");
+                                replyText(event.getReplyToken(),"+nama Namabaru\n" +
+                                                                              "+status Statusbaru");
+                                replyText(event.getReplyToken(),"Untuk bagian yang gak ingin kamu ganti, cukup isi dengan \"##\" aja ya. Misalnya: nama ##");
+                            }
+                            return;
+                        case "+nama":
+                            if(msg.contains("\n+status")) {
+                                String nama = msg.substring(6, msg.indexOf("\n+status"));
+                                String status = msg.substring(msg.indexOf("+status ") + 8);
+                                if(!nama.equals("##") && !status.equals("##")) {
+                                    replyText(event.getReplyToken(), "Sukses ganti nama menjadi " + nama + "\ndan status menjadi " + status);
+                                }else if(!nama.equals("##")) {
+                                    replyText(event.getReplyToken(), "Sukses ganti status menjadi " + status);
+                                }else if(!status.equals("##")) {
+                                    replyText(event.getReplyToken(), "Sukses ganti nama menjadi " + nama);
+                                }else{
+                                    replyText(event.getReplyToken(), "Yah sepertinya ada yang salah dengan Avo:(");
+                                }
+                            }else{
+                                replyText(event.getReplyToken(),"Aduh formatnya salah nih:(\n" +
+                                                                              "Formatnya:");
+                                replyText(event.getReplyToken(),"+nama Namabaru\n" +
+                                                                              "+status Statusbaru");
+                                replyText(event.getReplyToken(),"Untuk bagian yang gak ingin kamu ganti, cukup isi dengan \"##\" aja ya. Misalnya: nama ##");
+                            }
+                            return;
                     }
                 }
             }
@@ -336,6 +368,21 @@ public class Controller {
         reply(replyMessage);
     }
 
+    public void leaveGroup(String groupId) {
+        try {
+            lineMessagingClient.leaveGroup(groupId).get();
+        } catch (InterruptedException | ExecutionException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void leaveRoom(String groupId) {
+        try {
+            lineMessagingClient.leaveGroup(groupId).get();
+        } catch (InterruptedException | ExecutionException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
 
 }
