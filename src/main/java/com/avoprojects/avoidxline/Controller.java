@@ -12,6 +12,7 @@ import com.linecorp.bot.model.event.JoinEvent;
 import com.linecorp.bot.model.event.MessageEvent;
 import com.linecorp.bot.model.event.message.*;
 import com.linecorp.bot.model.event.source.*;
+import com.linecorp.bot.model.message.Message;
 import com.linecorp.bot.model.message.FlexMessage;
 import com.linecorp.bot.model.message.StickerMessage;
 import com.linecorp.bot.model.message.TextMessage;
@@ -34,7 +35,7 @@ import java.io.InputStream;
 
 @RestController
 public class Controller {
-    private static String[] keywords=new String[]{"jadwal uts","saham","indeks","index","profileku","edit profile","+nama"};
+    private static String[] keywords=new String[]{"jadwal uts","saham","indeks","index","profileku","edit profile","+nama","-leave"};
     @Autowired
     @Qualifier("lineMessagingClient")
     private LineMessagingClient lineMessagingClient;
@@ -186,32 +187,55 @@ public class Controller {
                             if(event.getSource() instanceof GroupSource || event.getSource() instanceof RoomSource){
                                 replyText(event.getReplyToken(),"Duh maaf Avo gak bisa bantu edit profile kamu disini:(");
                             }else{
-                                replyText(event.getReplyToken(),"Tulis nama & status yang mau kamu ubah ya.\n" +
-                                                                              "Formatnya:");
-                                replyText(event.getReplyToken(),"+nama Namabaru\n" +
-                                                                              "+status Statusbaru");
-                                replyText(event.getReplyToken(),"Untuk bagian yang gak ingin kamu ganti, cukup isi dengan \"##\" aja ya. Misalnya: nama ##");
+                                List<String> multimsg = new ArrayList<>();
+                                multimsg.add(
+                                                "Tulis nama & status yang mau kamu ubah ya.\n" +
+                                                "Formatnya:\n");
+                                multimsg.add(
+                                                "+nama Namabaru\n" +
+                                                "+status Statusbaru\n");
+                                multimsg.add(   "Untuk bagian yang gak ingin kamu ganti, cukup isi dengan \"##\" aja ya. Misalnya: nama ##");
+                                replyMultiMsg(event.getReplyToken(), multimsg);
                             }
                             return;
                         case "+nama":
-                            if(msg.contains("\n+status")) {
-                                String nama = msg.substring(6, msg.indexOf("\n+status"));
-                                String status = msg.substring(msg.indexOf("+status ") + 8);
-                                if(!nama.equals("##") && !status.equals("##")) {
-                                    replyText(event.getReplyToken(), "Sukses ganti nama menjadi " + nama + "\ndan status menjadi " + status);
-                                }else if(!nama.equals("##")) {
-                                    replyText(event.getReplyToken(), "Sukses ganti status menjadi " + status);
-                                }else if(!status.equals("##")) {
-                                    replyText(event.getReplyToken(), "Sukses ganti nama menjadi " + nama);
-                                }else{
-                                    replyText(event.getReplyToken(), "Yah sepertinya ada yang salah dengan Avo:(");
+                            if(event.getSource() instanceof GroupSource || event.getSource() instanceof RoomSource){
+                                replyText(event.getReplyToken(),"Duh maaf Avo gak bisa bantu edit profile kamu disini:(");
+                            }else {
+                                if (msg.contains("\n+status")) {
+                                    String nama = msg.substring(6, msg.indexOf("\n+status"));
+                                    String status = msg.substring(msg.indexOf("+status ") + 8);
+                                    if (!nama.equals("##") && !status.equals("##")) {
+                                        replyText(event.getReplyToken(), "Sukses ganti nama menjadi " + nama + "\ndan status menjadi " + status);
+                                    } else if (!nama.equals("##")) {
+                                        replyText(event.getReplyToken(), "Sukses ganti status menjadi " + status);
+                                    } else if (!status.equals("##")) {
+                                        replyText(event.getReplyToken(), "Sukses ganti nama menjadi " + nama);
+                                    } else {
+                                        replyText(event.getReplyToken(), "Yah sepertinya ada yang salah dengan Avo:(");
+                                    }
+                                } else {
+                                    List<String> multimsg = new ArrayList<>();
+                                    multimsg.add(
+                                                    "Aduh formatnya salah nih:(\n" +
+                                                    "Formatnya:\n");
+                                    multimsg.add(
+                                                    "+nama Namabaru\n" +
+                                                    "+status Statusbaru\n");
+                                    multimsg.add(   "Untuk bagian yang gak ingin kamu ganti, cukup isi dengan \"##\" aja ya. Misalnya: nama ##");
+                                    replyMultiMsg(event.getReplyToken(), multimsg);
                                 }
+                            }
+                            return;
+                        case "-leave":
+                            if(event.getSource() instanceof GroupSource) {
+                                replyText(event.getReplyToken(),"Yah:( Yaudah deh kalo gitu Avo pamit dulu ya.");
+                                leaveGroup(event.getSource().getSenderId());
+                            }else if(event.getSource() instanceof RoomSource){
+                                replyText(event.getReplyToken(),"Yah:( Yaudah deh kalo gitu Avo pamit dulu ya.");
+                                leaveRoom(event.getSource().getSenderId());
                             }else{
-                                replyText(event.getReplyToken(),"Aduh formatnya salah nih:(\n" +
-                                                                              "Formatnya:");
-                                replyText(event.getReplyToken(),"+nama Namabaru\n" +
-                                                                              "+status Statusbaru");
-                                replyText(event.getReplyToken(),"Untuk bagian yang gak ingin kamu ganti, cukup isi dengan \"##\" aja ya. Misalnya: nama ##");
+                                replyText(event.getReplyToken(),"Duh jangan usir Avo dong:(");
                             }
                             return;
                     }
@@ -367,7 +391,14 @@ public class Controller {
         ReplyMessage replyMessage = new ReplyMessage(replyToken, textMessage);
         reply(replyMessage);
     }
-
+    private void replyMultiMsg(String replyToken, List<String> msg) {
+        List<Message> msgArray = new ArrayList<>();
+        for(int i=0;i<msg.size();i++){
+            msgArray.add(new TextMessage(msg.get(i));
+        }
+        ReplyMessage replyMessage = new ReplyMessage(replyToken, msgArray);
+        reply(replyMessage);
+    }
     public void leaveGroup(String groupId) {
         try {
             lineMessagingClient.leaveGroup(groupId).get();
