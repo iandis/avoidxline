@@ -113,7 +113,12 @@ public class Controller {
     }
     private void handleTextMessage(MessageEvent event) {
         TextMessageContent textMessageContent = (TextMessageContent) event.getMessage();
-        String msg = textMessageContent.getText();
+        String msg = textMessageContent.getText();;
+//        if(event.getSource() instanceof GroupSource || event.getSource() instanceof RoomSource){
+//            msg = textMessageContent.getText().substring(4); //"avo "=4
+//        }else {
+//            msg = textMessageContent.getText();
+//        }
         for (String keyword : keywords) {
             if (msg.length() >= keyword.length()) {
                 if (msg.toLowerCase().substring(0, keyword.length()).equals(keyword)) {
@@ -267,8 +272,10 @@ public class Controller {
                 }
             }
         }
-        replyText(event.getReplyToken(), "Keyword salah:(");
+        if(!(event.getSource() instanceof GroupSource) || !(event.getSource() instanceof RoomSource)) {
+            replyText(event.getReplyToken(), "Keyword salah:(");
         }
+    }
     private void replyFlexMessage(String replyToken){
         replyFlexMessage(replyToken, 1, null);
     }
