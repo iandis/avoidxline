@@ -165,7 +165,7 @@ public class Controller {
                                     } else {
                                         dataset.add("#000000");
                                     }
-                                    replyFlexMessage(event.getReplyToken(), 2, dataset);
+                                    replyFlexMessage(event.getReplyToken(), 3, dataset);
                                 } else {
                                     replyText(event.getReplyToken(), symbol + " tidak ditemukan.");
                                 }
