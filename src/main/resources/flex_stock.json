@@ -100,12 +100,21 @@
         "type": "button",
         "height": "md",
         "action": {
-          "type": "postback",
+          "type": "message",
           "label": "Tambah ke Portofolio",
-          "data": "tambahporto",
-          "displayText": "+portofolio"
+          "text": "+portofolio Text7"
         },
         "style": "primary",
+        "color": "#2196F3"
+      },
+      {
+        "type": "button",
+        "height": "md",
+        "action": {
+          "type": "message",
+          "label": "Tambah ke Watchlist",
+          "text": "+watchlist Text8"
+        },
         "color": "#2196F3"
       },
       {
