@@ -218,8 +218,8 @@ public class Controller {
                                 }else{
                                     List<String> multimsg = new ArrayList<>();
                                     multimsg.add("Akun kamu belum terdaftar:( Silahkan daftar dulu ya dengan ketik");
-                                    multimsg.add("+daftar Nama +bio Biokamu");
-                                    multimsg.add("Misalnya: +daftar Avo's IDX +bio Yuk Nabung Saham!\nNama & bio gak boleh kosong ya.");
+                                    multimsg.add("+daftar Nama\n+bio Biokamu");
+                                    multimsg.add("Misalnya: \n+daftar Avo's IDX\n+bio Yuk Nabung Saham!\nNama & bio gak boleh kosong ya.");
                                     replyMultiMsg(event.getReplyToken(), multimsg);
                                 }
                                 return;
@@ -232,13 +232,13 @@ public class Controller {
                                 ReplyMessage replyMessage = new ReplyMessage(((ReplyEvent) event).getReplyToken(), msgArray);
                                 reply(replyMessage);
                             }else{
-                                if(msg.contains(" +bio ")){
-                                    String nama=msg.substring(8,msg.indexOf(" +bio")); //8 didapat dari length("+daftar ")
+                                if(msg.contains("\n+bio")){
+                                    String nama=msg.substring(8,msg.indexOf("\n+bio")); //8 didapat dari length("+daftar ")
                                     if(nama.equals("")){
                                         replyText(event.getReplyToken(),"Namanya gak boleh kosong ya:)");
                                         return;
                                     }
-                                    String bio = msg.substring(msg.indexOf(" +bio ") + 6); //6 didapat dari length(" +bio ")
+                                    String bio = msg.substring(msg.indexOf("\n+bio") + 6); //6 didapat dari length("\n+bio ")
                                     if(bio.equals("")){
                                         replyText(event.getReplyToken(),"Bionya gak boleh kosong ya:)");
                                         return;
@@ -248,8 +248,8 @@ public class Controller {
                                 }else{
                                     List<String> multimsg = new ArrayList<>();
                                     multimsg.add("Wah formatnya salah nih. Untuk daftar ketiknya");
-                                    multimsg.add("+daftar Nama +bio Biokamu");
-                                    multimsg.add("Misalnya: +daftar Avo's IDX +bio Yuk Nabung Saham!\nNama & bio gak boleh kosong ya.");
+                                    multimsg.add("+daftar Nama\n+bio Biokamu");
+                                    multimsg.add("Misalnya: \n+daftar Avo's IDX\n+bio Yuk Nabung Saham!\nNama & bio gak boleh kosong ya.");
                                     replyMultiMsg(event.getReplyToken(), multimsg);
                                 }
                             }
@@ -272,8 +272,8 @@ public class Controller {
                                 }else {
                                     List<String> multimsg = new ArrayList<>();
                                     multimsg.add("Akun kamu belum terdaftar:( Silahkan daftar dulu ya dengan ketik");
-                                    multimsg.add("+daftar Nama +bio Biokamu");
-                                    multimsg.add("Misalnya: +daftar Avo's IDX +bio Yuk Nabung Saham!\nNama & bio gak boleh kosong ya.");
+                                    multimsg.add("+daftar Nama\n+bio Biokamu");
+                                    multimsg.add("Misalnya: \n+daftar Avo's IDX\n+bio Yuk Nabung Saham!\nNama & bio gak boleh kosong ya.");
                                     replyMultiMsg(event.getReplyToken(), multimsg);
                                 }
                             }
@@ -286,8 +286,8 @@ public class Controller {
                                 if(!Dbs.isUserExist()) {
                                     List<String> multimsg = new ArrayList<>();
                                     multimsg.add("Akun kamu belum terdaftar:( Silahkan daftar dulu ya dengan ketik");
-                                    multimsg.add("+daftar Nama +bio Biokamu");
-                                    multimsg.add("Misalnya: +daftar Avo's IDX +bio Yuk Nabung Saham!\nNama & bio gak boleh kosong ya.");
+                                    multimsg.add("+daftar Nama\n+bio Biokamu");
+                                    multimsg.add("Misalnya: \n+daftar Avo's IDX\n+bio Yuk Nabung Saham!\nNama & bio gak boleh kosong ya.");
                                     replyMultiMsg(event.getReplyToken(), multimsg);
                                     return;
                                 }
@@ -297,7 +297,7 @@ public class Controller {
                                         replyText(event.getReplyToken(),"Namanya gak boleh kosong ya:)");
                                         return;
                                     }
-                                    String bio = msg.substring(msg.indexOf("+bio ") + 5); //5 didapat dari length("+bio ")
+                                    String bio = msg.substring(msg.indexOf("\n+bio") + 6); //6 didapat dari length("\n+bio ")
                                     if(bio.equals("")){
                                         replyText(event.getReplyToken(),"Bionya gak boleh kosong ya:)");
                                         return;
