@@ -49,7 +49,7 @@ public class Config
     }
 
     @Bean
-    private DataSource getDataSource()
+    DataSource getDataSource()
     {
         String dbUrl=System.getenv("JDBC_DATABASE_URL");
         String username=System.getenv("JDBC_DATABASE_USERNAME");
