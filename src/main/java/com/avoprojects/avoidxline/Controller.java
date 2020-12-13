@@ -44,14 +44,16 @@ public class Controller {
             "profile","edit profile",
             "+nama","+bio",
             "+daftar","-leave"};
-    @Autowired
-    private DbSvc Dbs;
+
     @Autowired
     @Qualifier("lineMessagingClient")
     private LineMessagingClient lineMessagingClient;
     @Autowired
     @Qualifier("lineSignatureValidator")
     private LineSignatureValidator lineSignatureValidator;
+
+    @Autowired
+    private DbSvc Dbs;
 
     @RequestMapping(value="/webhook", method= RequestMethod.POST)
     public ResponseEntity<String> callback(
@@ -141,6 +143,7 @@ public class Controller {
                     String symbol = "";
                     String userid = event.getSource().getUserId();
                     StocksAPI Stocks;
+                    Dbs=new DbSvc();
                     switch (keyword) {
                         case "jadwal uts":
                             replyFlexMessage(event.getReplyToken());
@@ -204,7 +207,7 @@ public class Controller {
                             }
                             return;
                         case "profile":
-                                Dbs=new DbSvc(userid);
+                                Dbs.init(userid);
                                 if(Dbs.isUserExist()){
                                     Dbs.initUser();
                                     ArrayList<String> user = new ArrayList<>();
@@ -221,7 +224,7 @@ public class Controller {
                                 }
                                 return;
                         case "+daftar":
-                            Dbs=new DbSvc(userid);
+                            Dbs.init(userid);
                             if(Dbs.isUserExist()){
                                 List<Message> msgArray = new ArrayList<>();
                                 msgArray.add(new TextMessage(String.format("Hai %s! Kamu udah terdaftar kok, tenang aja!",getProfile(userid).getDisplayName())));
@@ -255,7 +258,7 @@ public class Controller {
                             if (event.getSource() instanceof GroupSource || event.getSource() instanceof RoomSource) {
                                 replyText(event.getReplyToken(), "Duh maaf Avo gak bisa bantu edit profile kamu disini:(");
                             } else {
-                                Dbs=new DbSvc(userid);
+                                Dbs.init(userid);
                                 if(Dbs.isUserExist()) {
                                     List<String> multimsg = new ArrayList<>();
                                     multimsg.add(
@@ -279,7 +282,7 @@ public class Controller {
                             if (event.getSource() instanceof GroupSource || event.getSource() instanceof RoomSource) {
                                 replyText(event.getReplyToken(), "Duh maaf Avo gak bisa bantu edit profile kamu disini:(");
                             } else {
-                                Dbs=new DbSvc(userid);
+                                Dbs.init(userid);
                                 if(!Dbs.isUserExist()) {
                                     List<String> multimsg = new ArrayList<>();
                                     multimsg.add("Akun kamu belum terdaftar:( Silahkan daftar dulu ya dengan ketik");

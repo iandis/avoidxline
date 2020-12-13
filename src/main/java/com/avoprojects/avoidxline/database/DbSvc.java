@@ -4,6 +4,7 @@ import com.avoprojects.avoidxline.model.PortoWatchlist;
 import com.avoprojects.avoidxline.model.TopWatchlist;
 import com.avoprojects.avoidxline.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -12,18 +13,19 @@ import java.util.List;
 public class DbSvc {
     @Autowired
     private Dao mDao;
+
     private String uid;
     private int psize, wsize;
     private User uProfile;
     private List<PortoWatchlist> uPorto, uWlist;
     private boolean userExist;
-    public DbSvc(String uid){
+    public void init(String uid){
         this.uid = uid;
         try{
             uProfile=mDao.getUser(uid);
-            userExist=uProfile!=null;
+            userExist= uProfile!=null;
         }catch(Exception e){
-            userExist=false;
+            userExist= false;
         }
     }
     public void initUser(){
