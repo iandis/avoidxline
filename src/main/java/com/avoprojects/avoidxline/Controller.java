@@ -1,5 +1,7 @@
 package com.avoprojects.avoidxline;
 
+import com.avoprojects.avoidxline.database.DbSvc;
+import com.avoprojects.avoidxline.model.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.linecorp.bot.client.LineMessagingClient;
 import com.linecorp.bot.client.LineSignatureValidator;
@@ -10,6 +12,7 @@ import com.linecorp.bot.model.ReplyMessage;
 import com.linecorp.bot.model.event.FollowEvent;
 import com.linecorp.bot.model.event.JoinEvent;
 import com.linecorp.bot.model.event.MessageEvent;
+import com.linecorp.bot.model.event.ReplyEvent;
 import com.linecorp.bot.model.event.message.*;
 import com.linecorp.bot.model.event.source.*;
 import com.linecorp.bot.model.message.Message;
@@ -38,9 +41,11 @@ public class Controller {
     private static String[] keywords=new String[]{
             "jadwal uts","saham",
             "indeks","index",
-            "profileku","edit profile",
-            "+nama","+status",
-            "-leave"};
+            "profile","edit profile",
+            "+nama","+bio",
+            "+daftar","-leave"};
+    @Autowired
+    private DbSvc Dbs;
     @Autowired
     @Qualifier("lineMessagingClient")
     private LineMessagingClient lineMessagingClient;
@@ -68,8 +73,19 @@ public class Controller {
                     } else {
                         handleOneOnOneChats((MessageEvent) event);
                     }
-                }else if(event instanceof JoinEvent || event instanceof FollowEvent){
-
+                }else if(event instanceof JoinEvent){
+                    if (event.getSource() instanceof GroupSource || event.getSource() instanceof RoomSource){
+                        List<Message> msgArray = new ArrayList<>();
+                        msgArray.add(new TextMessage(
+                                "Hai!\n"+
+                                "Terimakasih telah menambahkan Avo kesini"));
+                        msgArray.add(new StickerMessage("1", "2"));
+                        msgArray.add(new TextMessage(
+                                "Ketik \"profile\" kalau kamu mau liat profile kamu ya.\n"+
+                                        "Tapi pastikan kamu udah jadiin aku teman kamu dulu okey?:)"));
+                        ReplyMessage replyMessage = new ReplyMessage(((ReplyEvent) event).getReplyToken(), msgArray);
+                        reply(replyMessage);
+                    }
                 }
             });
 
@@ -98,7 +114,7 @@ public class Controller {
         if(senderId!=null) {
             handleTextMessage(event);
         } else {
-            replyText(event.getReplyToken(), "Hai, tambahin Avo dulu dong jadi teman kamu:(");
+            replyText(event.getReplyToken(), "Hai, tambahin Avo dulu dong jadi teman kamu:)");
         }
     }
     private void handleContentMessage(MessageEvent event) {
@@ -113,7 +129,7 @@ public class Controller {
     }
     private void handleTextMessage(MessageEvent event) {
         TextMessageContent textMessageContent = (TextMessageContent) event.getMessage();
-        String msg = textMessageContent.getText();;
+        String msg = textMessageContent.getText();
 //        if(event.getSource() instanceof GroupSource || event.getSource() instanceof RoomSource){
 //            msg = textMessageContent.getText().substring(4); //"avo "=4
 //        }else {
@@ -123,6 +139,7 @@ public class Controller {
             if (msg.length() >= keyword.length()) {
                 if (msg.toLowerCase().substring(0, keyword.length()).equals(keyword)) {
                     String symbol = "";
+                    String userid = event.getSource().getUserId();
                     StocksAPI Stocks;
                     switch (keyword) {
                         case "jadwal uts":
@@ -181,51 +198,117 @@ public class Controller {
                                     }
                                     replyFlexMessage(event.getReplyToken(), 2, dataset);
                                 } else {
-                                    replyText(event.getReplyToken(), symbol + " tidak ditemukan.");
+                                    replyText(event.getReplyToken(), symbol.toUpperCase() + " tidak ditemukan.");
                                 }
                             } catch (Exception ignored) {
                             }
                             return;
-                        case "profileku":
-                            UserProfileResponse profile = getProfile(event.getSource().getUserId());
-                            String dispName = profile.getDisplayName();
-                            String userStatus = "Yuk Nabung Saham!";
-                            String picUrl = profile.getPictureUrl();
-                            ArrayList<String> user = new ArrayList<>();
-                            user.add(dispName);
-                            user.add(userStatus);
-                            user.add(picUrl);
-                            replyFlexMessage(event.getReplyToken(), 3, user);
+                        case "profile":
+                                Dbs=new DbSvc(userid);
+                                if(Dbs.isUserExist()){
+                                    Dbs.initUser();
+                                    ArrayList<String> user = new ArrayList<>();
+                                    user.add(Dbs.getUserProfile().uname);
+                                    user.add(Dbs.getUserProfile().ustatus);
+                                    user.add(getProfile(userid).getPictureUrl());
+                                    replyFlexMessage(event.getReplyToken(), 3, user);
+                                }else{
+                                    List<String> multimsg = new ArrayList<>();
+                                    multimsg.add("Akun kamu belum terdaftar:( Silahkan daftar dulu ya dengan ketik");
+                                    multimsg.add("+daftar Nama +bio Biokamu");
+                                    multimsg.add("Misalnya: +daftar Avo's IDX +bio Yuk Nabung Saham!\nNama & bio gak boleh kosong ya.");
+                                    replyMultiMsg(event.getReplyToken(), multimsg);
+                                }
+                                return;
+                        case "+daftar":
+                            Dbs=new DbSvc(userid);
+                            if(Dbs.isUserExist()){
+                                List<Message> msgArray = new ArrayList<>();
+                                msgArray.add(new TextMessage(String.format("Hai %s! Kamu udah terdaftar kok, tenang aja!",getProfile(userid).getDisplayName())));
+                                msgArray.add(new StickerMessage("1", "13"));
+                                ReplyMessage replyMessage = new ReplyMessage(((ReplyEvent) event).getReplyToken(), msgArray);
+                                reply(replyMessage);
+                            }else{
+                                if(msg.contains(" +bio ")){
+                                    String nama=msg.substring(8,msg.indexOf(" +bio")); //8 didapat dari length("+daftar ")
+                                    if(nama.equals("")){
+                                        replyText(event.getReplyToken(),"Namanya gak boleh kosong ya:)");
+                                        return;
+                                    }
+                                    String bio = msg.substring(msg.indexOf(" +bio ") + 6); //6 didapat dari length(" +bio ")
+                                    if(bio.equals("")){
+                                        replyText(event.getReplyToken(),"Bionya gak boleh kosong ya:)");
+                                        return;
+                                    }
+                                    Dbs.createUser(nama,bio);
+                                    replyText(event.getReplyToken(),"Yeay! Pendaftaran kamu sukses!");
+                                }else{
+                                    List<String> multimsg = new ArrayList<>();
+                                    multimsg.add("Wah formatnya salah nih. Untuk daftar ketiknya");
+                                    multimsg.add("+daftar Nama +bio Biokamu");
+                                    multimsg.add("Misalnya: +daftar Avo's IDX +bio Yuk Nabung Saham!\nNama & bio gak boleh kosong ya.");
+                                    replyMultiMsg(event.getReplyToken(), multimsg);
+                                }
+                            }
                             return;
                         case "edit profile":
                             if (event.getSource() instanceof GroupSource || event.getSource() instanceof RoomSource) {
                                 replyText(event.getReplyToken(), "Duh maaf Avo gak bisa bantu edit profile kamu disini:(");
                             } else {
-                                List<String> multimsg = new ArrayList<>();
-                                multimsg.add(
-                                                "Tulis nama & status yang mau kamu ubah ya.\n" +
-                                                "Formatnya:");
-                                multimsg.add(
-                                                "+nama Namabaru\n" +
-                                                "+status Statusbaru");
-                                multimsg.add("Untuk bagian yang gak ingin kamu ganti, cukup isi dengan \"##\" aja ya. Misalnya: nama ##");
-                                replyMultiMsg(event.getReplyToken(), multimsg);
+                                Dbs=new DbSvc(userid);
+                                if(Dbs.isUserExist()) {
+                                    List<String> multimsg = new ArrayList<>();
+                                    multimsg.add(
+                                            "Tulis nama & bio yang mau kamu ubah ya.\n" +
+                                                    "Formatnya:");
+                                    multimsg.add(
+                                            "+nama Namabaru\n" +
+                                                    "+bio Biobaru");
+                                    multimsg.add("Untuk bagian yang gak ingin kamu ganti, cukup isi dengan \"##\" aja ya. Misalnya: nama ##");
+                                    replyMultiMsg(event.getReplyToken(), multimsg);
+                                }else {
+                                    List<String> multimsg = new ArrayList<>();
+                                    multimsg.add("Akun kamu belum terdaftar:( Silahkan daftar dulu ya dengan ketik");
+                                    multimsg.add("+daftar Nama +bio Biokamu");
+                                    multimsg.add("Misalnya: +daftar Avo's IDX +bio Yuk Nabung Saham!\nNama & bio gak boleh kosong ya.");
+                                    replyMultiMsg(event.getReplyToken(), multimsg);
+                                }
                             }
                             return;
                         case "+nama":
                             if (event.getSource() instanceof GroupSource || event.getSource() instanceof RoomSource) {
                                 replyText(event.getReplyToken(), "Duh maaf Avo gak bisa bantu edit profile kamu disini:(");
                             } else {
-                                if (msg.contains("\n+status")) {
-                                    String nama = msg.substring(6, msg.indexOf("\n+status"));
-                                    String status = msg.substring(msg.indexOf("+status ") + 8);
-                                    if (!nama.equals("##") && !status.equals("##")) {
-                                        replyText(event.getReplyToken(),"Sukses ganti nama menjadi " + nama + "\ndan status menjadi " + status);
+                                Dbs=new DbSvc(userid);
+                                if(!Dbs.isUserExist()) {
+                                    List<String> multimsg = new ArrayList<>();
+                                    multimsg.add("Akun kamu belum terdaftar:( Silahkan daftar dulu ya dengan ketik");
+                                    multimsg.add("+daftar Nama +bio Biokamu");
+                                    multimsg.add("Misalnya: +daftar Avo's IDX +bio Yuk Nabung Saham!\nNama & bio gak boleh kosong ya.");
+                                    replyMultiMsg(event.getReplyToken(), multimsg);
+                                    return;
+                                }
+                                if (msg.contains("\n+bio")) {
+                                    String nama = msg.substring(6, msg.indexOf("\n+bio")); //6 didapat dari length("+nama ")
+                                    if(nama.equals("")){
+                                        replyText(event.getReplyToken(),"Namanya gak boleh kosong ya:)");
+                                        return;
+                                    }
+                                    String bio = msg.substring(msg.indexOf("+bio ") + 5); //5 didapat dari length("+bio ")
+                                    if(bio.equals("")){
+                                        replyText(event.getReplyToken(),"Bionya gak boleh kosong ya:)");
+                                        return;
+                                    }
+                                    if (!nama.equals("##") && !bio.equals("##")) {
+                                        Dbs.updateUser(nama,bio);
+                                        replyText(event.getReplyToken(),"Sukses ganti nama menjadi " + nama + "\ndan bio menjadi " + bio);
                                     } else if (!nama.equals("##")) {
+                                        Dbs.updateUsername(nama);
                                         replyText(event.getReplyToken(),"Sukses ganti nama menjadi " + nama);
-                                    } else if (!status.equals("##")) {
-                                        replyText(event.getReplyToken(),"Sukses ganti status menjadi " + status);
-                                    } else if (nama.equals("##") && status.equals("##")) {
+                                    } else if (!bio.equals("##")) {
+                                        Dbs.updateUserbio(bio);
+                                        replyText(event.getReplyToken(),"Sukses ganti bio menjadi " + bio);
+                                    } else if (nama.equals("##") && bio.equals("##")) {
                                         replyText(event.getReplyToken(),"Sukses gak ganti apa-apa:)");
                                     } else {
                                         replyText(event.getReplyToken(),"Yah sepertinya ada yang salah dengan Avo:(");
@@ -237,13 +320,13 @@ public class Controller {
                                                     "Formatnya:");
                                     multimsg.add(
                                             "+nama Namabaru\n" +
-                                                    "+status Statusbaru");
+                                                    "+bio Biobaru");
                                     multimsg.add("Untuk bagian yang gak ingin kamu ganti, cukup isi dengan \"##\" aja ya. Misalnya: nama ##");
                                     replyMultiMsg(event.getReplyToken(), multimsg);
                                 }
                             }
                             return;
-                        case "+status":
+                        case "+bio":
                             if (event.getSource() instanceof GroupSource || event.getSource() instanceof RoomSource) {
                                 replyText(event.getReplyToken(), "Duh maaf Avo gak bisa bantu edit profile kamu disini:(");
                             } else {
@@ -253,7 +336,7 @@ public class Controller {
                                                 "Formatnya:");
                                 multimsg.add(
                                         "+nama Namabaru\n" +
-                                                "+status Statusbaru");
+                                                "+bio Biobaru");
                                 multimsg.add("Untuk bagian yang gak ingin kamu ganti, cukup isi dengan \"##\" aja ya. Misalnya: nama ##");
                                 replyMultiMsg(event.getReplyToken(), multimsg);
                             }

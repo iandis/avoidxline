@@ -1,11 +1,14 @@
 package com.avoprojects.avoidxline;
-
+import com.avoprojects.avoidxline.database.Dao;
+import com.avoprojects.avoidxline.database.DaoImpl;
 import com.linecorp.bot.client.LineMessagingClient;
 import com.linecorp.bot.client.LineSignatureValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.jdbc.datasource.DriverManagerDataSource;
+import javax.sql.DataSource;
 import org.springframework.core.env.Environment;
 
 @Configuration
@@ -43,5 +46,27 @@ public class Config
     public LineSignatureValidator getSignatureValidator()
     {
         return new LineSignatureValidator(getChannelSecret().getBytes());
+    }
+
+    @Bean
+    private DataSource getDataSource()
+    {
+        String dbUrl=System.getenv("JDBC_DATABASE_URL");
+        String username=System.getenv("JDBC_DATABASE_USERNAME");
+        String password=System.getenv("JDBC_DATABASE_PASSWORD");
+
+        DriverManagerDataSource ds=new DriverManagerDataSource();
+        ds.setDriverClassName("org.postgresql.Driver");
+        ds.setUrl(dbUrl);
+        ds.setUsername(username);
+        ds.setPassword(password);
+
+        return ds;
+    }
+
+    @Bean
+    public Dao getPersonDao()
+    {
+        return new DaoImpl(getDataSource());
     }
 }

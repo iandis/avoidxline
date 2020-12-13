@@ -1,4 +1,4 @@
-package com.avoprojects.avoidxline;
+package com.avoprojects.avoidxline.model;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonInclude;
