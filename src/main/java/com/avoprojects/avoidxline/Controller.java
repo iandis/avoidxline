@@ -132,18 +132,12 @@ public class Controller {
     private void handleTextMessage(MessageEvent event) {
         TextMessageContent textMessageContent = (TextMessageContent) event.getMessage();
         String msg = textMessageContent.getText();
-//        if(event.getSource() instanceof GroupSource || event.getSource() instanceof RoomSource){
-//            msg = textMessageContent.getText().substring(4); //"avo "=4
-//        }else {
-//            msg = textMessageContent.getText();
-//        }
         for (String keyword : keywords) {
             if (msg.length() >= keyword.length()) {
                 if (msg.toLowerCase().substring(0, keyword.length()).equals(keyword)) {
                     String symbol = "";
                     String userid = event.getSource().getUserId();
                     StocksAPI Stocks;
-                    Dbs=new DbSvc();
                     switch (keyword) {
                         case "jadwal uts":
                             replyFlexMessage(event.getReplyToken());
@@ -207,12 +201,11 @@ public class Controller {
                             }
                             return;
                         case "profile":
-                                Dbs.init(userid);
-                                if(Dbs.isUserExist()){
-                                    Dbs.initUser();
+                                if(Dbs.isUserExist(userid)){
+                                    User usr = Dbs.getUserProfile(userid);
                                     ArrayList<String> user = new ArrayList<>();
-                                    user.add(Dbs.getUserProfile().uname);
-                                    user.add(Dbs.getUserProfile().ustatus);
+                                    user.add(usr.uname);
+                                    user.add(usr.ustatus);
                                     user.add(getProfile(userid).getPictureUrl());
                                     replyFlexMessage(event.getReplyToken(), 3, user);
                                 }else{
@@ -224,8 +217,7 @@ public class Controller {
                                 }
                                 return;
                         case "+daftar":
-                            Dbs.init(userid);
-                            if(Dbs.isUserExist()){
+                            if(Dbs.isUserExist(userid)){
                                 List<Message> msgArray = new ArrayList<>();
                                 msgArray.add(new TextMessage(String.format("Hai %s! Kamu udah terdaftar kok, tenang aja!",getProfile(userid).getDisplayName())));
                                 msgArray.add(new StickerMessage("1", "13"));
@@ -243,7 +235,7 @@ public class Controller {
                                         replyText(event.getReplyToken(),"Bionya gak boleh kosong ya:)");
                                         return;
                                     }
-                                    Dbs.createUser(nama,bio);
+                                    Dbs.createUser(userid,nama,bio);
                                     replyText(event.getReplyToken(),"Yeay! Pendaftaran kamu sukses!");
                                 }else{
                                     List<String> multimsg = new ArrayList<>();
@@ -258,8 +250,7 @@ public class Controller {
                             if (event.getSource() instanceof GroupSource || event.getSource() instanceof RoomSource) {
                                 replyText(event.getReplyToken(), "Duh maaf Avo gak bisa bantu edit profile kamu disini:(");
                             } else {
-                                Dbs.init(userid);
-                                if(Dbs.isUserExist()) {
+                                if(Dbs.isUserExist(userid)) {
                                     List<String> multimsg = new ArrayList<>();
                                     multimsg.add(
                                             "Tulis nama & bio yang mau kamu ubah ya.\n" +
@@ -282,8 +273,7 @@ public class Controller {
                             if (event.getSource() instanceof GroupSource || event.getSource() instanceof RoomSource) {
                                 replyText(event.getReplyToken(), "Duh maaf Avo gak bisa bantu edit profile kamu disini:(");
                             } else {
-                                Dbs.init(userid);
-                                if(!Dbs.isUserExist()) {
+                                if(!Dbs.isUserExist(userid)) {
                                     List<String> multimsg = new ArrayList<>();
                                     multimsg.add("Akun kamu belum terdaftar:( Silahkan daftar dulu ya dengan ketik");
                                     multimsg.add("+daftar Nama\n+bio Biokamu");
@@ -303,13 +293,13 @@ public class Controller {
                                         return;
                                     }
                                     if (!nama.equals("##") && !bio.equals("##")) {
-                                        Dbs.updateUser(nama,bio);
+                                        Dbs.updateUser(userid,nama,bio);
                                         replyText(event.getReplyToken(),"Sukses ganti nama menjadi " + nama + "\ndan bio menjadi " + bio);
                                     } else if (!nama.equals("##")) {
-                                        Dbs.updateUsername(nama);
+                                        Dbs.updateUsername(userid,nama);
                                         replyText(event.getReplyToken(),"Sukses ganti nama menjadi " + nama);
                                     } else if (!bio.equals("##")) {
-                                        Dbs.updateUserbio(bio);
+                                        Dbs.updateUserbio(userid,bio);
                                         replyText(event.getReplyToken(),"Sukses ganti bio menjadi " + bio);
                                     } else if (nama.equals("##") && bio.equals("##")) {
                                         replyText(event.getReplyToken(),"Sukses gak ganti apa-apa:)");

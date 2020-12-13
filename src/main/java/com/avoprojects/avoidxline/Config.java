@@ -60,9 +60,6 @@ public class Config
         ds.setUrl(dbUrl);
         ds.setUsername(username);
         ds.setPassword(password);
-        System.out.println(dbUrl);
-        System.out.println(username);
-        System.out.println(password);
         return ds;
     }
 

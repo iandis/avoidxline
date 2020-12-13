@@ -4,7 +4,6 @@ import com.avoprojects.avoidxline.model.PortoWatchlist;
 import com.avoprojects.avoidxline.model.TopWatchlist;
 import com.avoprojects.avoidxline.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -14,48 +13,19 @@ public class DbSvc {
     @Autowired
     private Dao mDao;
 
-    private String uid;
-    private int psize, wsize;
-    private User uProfile;
-    private List<PortoWatchlist> uPorto, uWlist;
-    private boolean userExist;
-    public void init(String uid){
-        this.uid = uid;
-        try{
-            uProfile=mDao.getUser(uid);
-            userExist= uProfile!=null;
-        }catch(Exception e){
-            userExist= false;
-        }
+    public boolean isUserExist(String userid){
+        return mDao.getUser(userid) != null;
     }
-    public void initUser(){
-        uPorto=mDao.getUserPorto(uid);
-        uWlist=mDao.getUserWlist(uid);
-        psize=uPorto.size();
-        wsize=uWlist.size();
-    }
-    public boolean isUserExist(){
-        return userExist;
-    }
-    public int createUser(String username, String userstatus){
+    public int createUser(String uid,String username, String userstatus){
         int self = mDao.regUser(uid,username,userstatus);
-        uProfile.uname=username;
-        uProfile.userid=uid;
-        uProfile.ustatus=userstatus;
         mDao.newPorto(uid);
         mDao.newWlist(uid);
         return self;
     }
-    public int insertPorto(String simbol){
-        int plist = 1;
-        for(PortoWatchlist p: uPorto){
-            if(simbol.equals(p.simbol)){
-                plist=1;
-                break;
-            }
-            plist=0;
-        }
-        if(plist == 0){
+    public int insertPorto(String uid,String simbol){
+        PortoWatchlist plist = mDao.findPortoSimbol(uid,simbol);
+        int psize=mDao.getUserPorto(uid).size();
+        if(plist == null){
             if(psize<10) {
                 return mDao.insPorto(uid, simbol);
             }else{
@@ -65,16 +35,10 @@ public class DbSvc {
             return -1; //simbol udh ada
         }
     }
-    public int insertWlist(String simbol){
-        int wlist = 1;
-        for(PortoWatchlist w: uWlist){
-            if(simbol.equals(w.simbol)){
-                wlist=1;
-                break;
-            }
-            wlist=0;
-        }
-        if(wlist == 0){
+    public int insertWlist(String uid,String simbol){
+        PortoWatchlist wlist = mDao.findPortoSimbol(uid,simbol);
+        int wsize=mDao.getUserPorto(uid).size();
+        if(wlist == null){
             if(wsize<20) {
                 return mDao.insWlist(uid, simbol);
             }else{
@@ -84,17 +48,11 @@ public class DbSvc {
             return -1; //simbol udh ada
         }
     }
-    public int deletePorto(String simbol){
-        int plist = 1;
-        for(PortoWatchlist p: uPorto){
-            if(simbol.equals(p.simbol)){
-                plist=1;
-                break;
-            }
-            plist=0;
-        }
+    public int deletePorto(String uid,String simbol){
+        PortoWatchlist plist = mDao.findPortoSimbol(uid,simbol);
+        int psize=mDao.getUserPorto(uid).size();
         if(psize>0){
-            if(plist != 0){
+            if(plist != null){
                 return mDao.delPortoSimbol(uid,simbol);
             }else{
                 return -2; //tidak ada simbol tsb
@@ -103,17 +61,11 @@ public class DbSvc {
             return -1; //porto kosong
         }
     }
-    public int deleteWlist(String simbol){
-        int wlist = 1;
-        for(PortoWatchlist p: uWlist){
-            if(simbol.equals(p.simbol)){
-                wlist=1;
-                break;
-            }
-            wlist=0;
-        }
+    public int deleteWlist(String uid,String simbol){
+        PortoWatchlist wlist = mDao.findPortoSimbol(uid,simbol);
+        int wsize=mDao.getUserPorto(uid).size();
         if(wsize>0){
-            if(wlist != 0){
+            if(wlist != null){
                 return mDao.delWlistSimbol(uid,simbol);
             }else{
                 return -2; //tidak ada simbol tsb
@@ -122,23 +74,23 @@ public class DbSvc {
             return -1; //porto kosong
         }
     }
-    public int updateUsername(String newname){
+    public int updateUsername(String uid,String newname){
         return mDao.updUserName(uid,newname);
     }
-    public int updateUserbio(String newbio){
+    public int updateUserbio(String uid,String newbio){
         return mDao.updUserStatus(uid,newbio);
     }
-    public int updateUser(String newname, String newbio){
+    public int updateUser(String uid,String newname, String newbio){
         return mDao.updUser(uid,newname,newbio);
     }
-    public User getUserProfile(){
-        return uProfile;
+    public User getUserProfile(String uid){
+        return mDao.getUser(uid);
     }
-    public List<PortoWatchlist> getUserPorto(){
-        return uPorto;
+    public List<PortoWatchlist> getUserPorto(String uid){
+        return mDao.getUserPorto(uid);
     }
-    public List<PortoWatchlist> getUserWlist(){
-        return uWlist;
+    public List<PortoWatchlist> getUserWlist(String uid){
+        return mDao.getUserWlist(uid);
     }
     public List<TopWatchlist> getTopWatchlist(){
         return mDao.getTopList();
