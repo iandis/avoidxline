@@ -436,10 +436,10 @@ public class Controller {
                 changep=changep+Double.parseDouble(changex);
                 portox=portox.replaceAll("ChangeX",changex);
                 String color="#000000";
-                if (changex.contains("+")) {
-                    color="#2E7D32";
-                } else if (changex.contains("-")) {
-                    color="#C62828";
+                if (Double.parseDouble(changex)>0) {
+                    color="#2E7D32"; //hijau
+                } else if (Double.parseDouble(changex)<0) {
+                    color="#C62828"; //merah
                 }
                 portox=portox.replaceAll("ColorCX",color);
                 bubble=bubble.replaceAll("SeparatorSimbol",portox);
