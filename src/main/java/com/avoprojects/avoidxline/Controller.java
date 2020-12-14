@@ -180,6 +180,45 @@ public class Controller {
                         case "portofolio":
                             replyPortoFlex(event.getReplyToken(),userid);
                             return;
+                        case "+portofolio":
+                            if(Dbs.isUserExist(userid)){
+                                symbol = msg.toUpperCase().substring("+portofolio ".length());
+                                ArrayList<ArrayList<String>> dataaset=Stocks.getQuote(new String[]{symbol + ".JK"});
+                                if (dataaset != null) {
+                                    int b = Dbs.insertPorto(userid,symbol+".JK");
+                                    if(b>0) {
+                                        replyText(event.getReplyToken(), "Yeay! Berhasil menambahkan " + symbol + " ke portofolio kamu.");
+                                    }else if(b==-1){
+                                        replyFallback(event.getReplyToken(),17); //simbol sudah ada
+                                    }else if(b==-2){
+                                        replyFallback(event.getReplyToken(),15); //porto penuh
+                                    }else{
+                                        replyFallback(event.getReplyToken(),14);
+                                    }
+                                }else{
+                                    replyText(event.getReplyToken(), symbol + " tidak ditemukan.");
+                                }
+                            }else{
+                                replyFallback(event.getReplyToken(),3);
+                            }
+                            return;
+                        case "-portofolio":
+                            if(Dbs.isUserExist(userid)){
+                                symbol = msg.toUpperCase().substring("-portofolio ".length());
+                                int b = Dbs.deletePorto(userid,symbol+".JK");
+                                if (b>0) {
+                                    replyText(event.getReplyToken(), symbol + " berhasil dihapus dari portofolio kamu.");
+                                }else if(b==-1){
+                                    replyFallback(event.getReplyToken(),12); //porto kosong
+                                }else if(b==-2){
+                                    replyText(event.getReplyToken(), symbol + " tidak ditemukan."); //simbol tidak ditemukan
+                                }else{
+                                    replyFallback(event.getReplyToken(),14);
+                                }
+                            }else{
+                                replyFallback(event.getReplyToken(),3);
+                            }
+                            return;
                         case "saham":
                             symbol = msg.toUpperCase().substring(6); //misal teks "saham BBCA", berarti memisahkan teks "saham " dengan "BBCA"
                             ArrayList<ArrayList<String>> dataaset=Stocks.getQuote(new String[]{symbol + ".JK"});
@@ -501,6 +540,18 @@ public class Controller {
                 break;
             case 14: //unknown error
                 replyText(replyToken,"Yah sepertinya ada yang salah dengan Avo:(");
+                break;
+            case 15: //porto penuh
+                replyText(replyToken,"Wah, portofolio kamu sudah penuh. Maksimal isi portofolio adalah 10.");
+                break;
+            case 16: //watchlist penuh
+                replyText(replyToken,"Wah, watchlist kamu sudah penuh. Maksimal isi watchlist adalah 20.");
+                break;
+            case 17: //simbol porto sudah ada
+                replyText(replyToken,"Kode yang kamu daftarkan sudah ada ya di portofolio kamu.");
+                break;
+            case 18: //simbol porto sudah ada
+                replyText(replyToken,"Kode yang kamu daftarkan sudah ada ya di watchlist kamu.");
                 break;
         }
     }

@@ -96,6 +96,17 @@
         },
         "height": "sm",
         "color": "#2196F3"
+      },
+      {
+        "type": "button",
+        "action": {
+          "type": "message",
+          "label": "Kembali ke Menu",
+          "text": "menu"
+        },
+        "height": "sm",
+        "color": "#2196F3",
+        "style": "primary"
       }
     ]
   },
