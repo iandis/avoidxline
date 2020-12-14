@@ -432,13 +432,14 @@ public class Controller {
             for(int i = 0; i<dataaset.size();i++){
                 String portox;
                 portox=portowlist.replaceAll("SimbolX",simbols[i].replaceAll(".JK",""));
-                String changex=dataaset.get(i).get(4);
-                changep=changep+Double.parseDouble(changex);
-                portox=portox.replaceAll("ChangeX",changex);
+                double changex=Double.parseDouble(dataaset.get(i).get(4));
+                changep=changep+changex;
+                String changepx = String.format(changex > 0 ? "+%.2f%%" : "%.2f%%", changex);
+                portox=portox.replaceAll("ChangeX",changepx);
                 String color="#000000";
-                if (Double.parseDouble(changex)>0) {
+                if (changex>0) {
                     color="#2E7D32"; //hijau
-                } else if (Double.parseDouble(changex)<0) {
+                } else if (changex<0) {
                     color="#C62828"; //merah
                 }
                 portox=portox.replaceAll("ColorCX",color);
@@ -455,16 +456,16 @@ public class Controller {
             }
             bubble=bubble.replaceAll("ColorLR",color);
             bubble=bubble.replaceAll("SeparatorSimbol","");
-            bubble=bubble.replaceAll("SeparatorCarousel","");
+            bubble=bubble.replaceAll(",SeparatorCarousel","");
             carousel=carousel.replaceAll("SeparatorCarousel",bubble);
 
-            //ObjectMapper objectMapper = ModelObjectMapper.createNewObjectMapper();
-            //FlexContainer flexContainer = objectMapper.readValue(carousel, FlexContainer.class);
-            ReplyMessage replyMessage= new ReplyMessage(replyToken, new TextMessage(carousel));//new FlexMessage("Portofolioku", flexContainer));
+            ObjectMapper objectMapper = ModelObjectMapper.createNewObjectMapper();
+            FlexContainer flexContainer = objectMapper.readValue(carousel, FlexContainer.class);
+            ReplyMessage replyMessage= new ReplyMessage(replyToken, new FlexMessage("Portofolioku", flexContainer));//new TextMessage(carousel));
             reply(replyMessage);
         }catch(Exception e){
-            replyText(replyToken,e.toString());
-            //replyFallback(replyToken,14);
+            //replyText(replyToken,e.toString());
+            replyFallback(replyToken,14);
         }
     }
     private void replyFallback(String replyToken, int Fallbackcode){
