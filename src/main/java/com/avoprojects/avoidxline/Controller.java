@@ -135,24 +135,27 @@ public class Controller {
     }
     private void handleContentMessage(MessageEvent event) {
         Random random = new Random();
-        int maxrand=3;
-        int randInt=random.nextInt(maxrand+1);
+        int maxrand=6;
+        int randInt=random.nextInt(maxrand)+1;
         switch (randInt) {
             case 1:
+            case 4:
                 List<Message> msgArray = new ArrayList<>();
                 msgArray.add(new TextMessage("Apaan tuh."));
                 msgArray.add(new StickerMessage("1", "17"));
                 ReplyMessage replyMessage = new ReplyMessage(((ReplyEvent) event).getReplyToken(), msgArray);
                 reply(replyMessage);
                 break;
-            case 2:
+            case 3:
+            case 6:
                 List<Message> msgArray2 = new ArrayList<>();
                 msgArray2.add(new TextMessage("Dahlah males."));
                 msgArray2.add(new StickerMessage("1", "113"));
                 ReplyMessage replyMessage2 = new ReplyMessage(((ReplyEvent) event).getReplyToken(), msgArray2);
                 reply(replyMessage2);
                 break;
-            case 3:
+            case 2:
+            case 5:
                 List<Message> msgArray3 = new ArrayList<>();
                 msgArray3.add(new TextMessage("Hoam."));
                 msgArray3.add(new StickerMessage("1", "405"));
@@ -372,7 +375,7 @@ public class Controller {
     private void replyPortoFlex(String replyToken, String uid){
         List<PortoWatchlist> porto = Dbs.getUserPorto(uid);
         StocksAPI Stocks = new StocksAPI();
-        if(porto==null){
+        if(porto.size()==0){
             replyFallback(replyToken,12);
             return;
         }
@@ -421,8 +424,8 @@ public class Controller {
             ReplyMessage replyMessage= new ReplyMessage(replyToken, new FlexMessage("Portofolioku", flexContainer));
             reply(replyMessage);
         }catch(Exception e){
-            replyText(replyToken,e.getMessage());
-            //replyFallback(replyToken,14);
+            //replyText(replyToken,e.getMessage());
+            replyFallback(replyToken,14);
         }
     }
     private void replyFallback(String replyToken, int Fallbackcode){
