@@ -43,7 +43,7 @@
       SeparatorSimbol
       {
         "type": "spacer",
-        "margin": "md"
+        "size": "md"
       },
       {
         "type": "box",
