@@ -429,7 +429,8 @@ public class Controller {
             String portowlist = IOUtils.toString(classLoader.getResourceAsStream("portowlist_fraction.json"));
             ArrayList<ArrayList<String>> dataaset = Stocks.getQuote(simbols);
             double changep=0;
-            for(int i = 0; i<dataaset.size();i++){
+            int dtsize=dataaset.size();
+            for(int i = 0; i<dtsize;i++){
                 String portox;
                 portox=portowlist.replaceAll("SimbolX",simbols[i].replaceAll(".JK",""));
                 double changex=Double.parseDouble(dataaset.get(i).get(4));
@@ -446,6 +447,7 @@ public class Controller {
                 bubble=bubble.replaceAll("SeparatorSimbol",portox);
             }
             bubble=bubble.replaceAll("Text1","Portofolioku");
+            changep=changep/dtsize;
             String changepx = String.format(changep > 0 ? "+%.2f%%" : "%.2f%%", changep);
             bubble=bubble.replaceAll("LabaRugiX",changepx);
             String color="#000000";

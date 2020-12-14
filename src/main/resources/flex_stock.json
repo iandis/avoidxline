@@ -101,10 +101,9 @@
         "height": "md",
         "action": {
           "type": "message",
-          "label": "Tambah ke Portofolio",
-          "text": "+portofolio Text7"
+          "label": "Tambah ke Watchlist",
+          "text": "+watchlist Text8"
         },
-        "style": "primary",
         "color": "#2196F3"
       },
       {
@@ -112,10 +111,21 @@
         "height": "md",
         "action": {
           "type": "message",
-          "label": "Tambah ke Watchlist",
-          "text": "+watchlist Text8"
+          "label": "Tambah ke Portofolio",
+          "text": "+portofolio Text7"
         },
         "color": "#2196F3"
+      },
+      {
+        "type": "button",
+        "height": "md",
+        "action": {
+          "type": "message",
+          "label": "Kembali ke Menu",
+          "text": "menu"
+        },
+        "color": "#2196F3",
+        "style": "primary"
       },
       {
         "type": "spacer",

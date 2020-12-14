@@ -31,7 +31,9 @@
         "align": "end",
         "color": "ColorLR"
       }
-    ]
+    ],
+    "paddingStart": "3%",
+    "paddingEnd": "3%"
   },
   "footer": {
     "type": "box",
@@ -40,7 +42,7 @@
     "contents": [
       SeparatorSimbol
       {
-        "type": "separator",
+        "type": "spacer",
         "margin": "md"
       },
       {
