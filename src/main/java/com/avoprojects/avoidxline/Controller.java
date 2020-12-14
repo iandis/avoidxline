@@ -458,9 +458,9 @@ public class Controller {
             bubble=bubble.replaceAll("SeparatorCarousel","");
             carousel=carousel.replaceAll("SeparatorCarousel",bubble);
 
-            ObjectMapper objectMapper = ModelObjectMapper.createNewObjectMapper();
-            FlexContainer flexContainer = objectMapper.readValue(carousel, FlexContainer.class);
-            ReplyMessage replyMessage= new ReplyMessage(replyToken, new FlexMessage("Portofolioku", flexContainer));
+            //ObjectMapper objectMapper = ModelObjectMapper.createNewObjectMapper();
+            //FlexContainer flexContainer = objectMapper.readValue(carousel, FlexContainer.class);
+            ReplyMessage replyMessage= new ReplyMessage(replyToken, new TextMessage(carousel));//new FlexMessage("Portofolioku", flexContainer));
             reply(replyMessage);
         }catch(Exception e){
             replyText(replyToken,e.toString());
