@@ -90,7 +90,6 @@ public class DaoImpl implements Dao {
         {
             while(resultSet.next()){
                 PortoWatchlist Porto = new PortoWatchlist(
-                        resultSet.getString("userid"),
                         resultSet.getString("p_simbol"));
                 return Porto;
             }
@@ -107,7 +106,6 @@ public class DaoImpl implements Dao {
             while(resultSet.next())
             {
                 PortoWatchlist portolist = new PortoWatchlist(
-                        resultSet.getString("userid"),
                         resultSet.getString("p_simbol"));
                 list.add(portolist);
             }
@@ -122,7 +120,6 @@ public class DaoImpl implements Dao {
         {
             while(resultSet.next()){
                 PortoWatchlist Wlist =new PortoWatchlist(
-                        resultSet.getString("userid"),
                         resultSet.getString("w_simbol"));
                 return Wlist;
             }
@@ -139,7 +136,6 @@ public class DaoImpl implements Dao {
             while(resultSet.next())
             {
                 PortoWatchlist watchlist = new PortoWatchlist(
-                        resultSet.getString("userid"),
                         resultSet.getString("w_simbol"));
                 list.add(watchlist);
             }
