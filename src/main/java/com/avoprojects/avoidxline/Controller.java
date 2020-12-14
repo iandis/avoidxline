@@ -174,6 +174,9 @@ public class Controller {
                         case "menu":
                             replyMenu(event.getReplyToken());
                             return;
+                        case "portofolio":
+                            replyPortoFlex(event.getReplyToken(),userid);
+                            return;
                         case "saham":
                             symbol = msg.toUpperCase().substring(6); //misal teks "saham BBCA", berarti memisahkan teks "saham " dengan "BBCA"
                             ArrayList<ArrayList<String>> dataaset=Stocks.getQuote(new String[]{symbol + ".JK"});
@@ -385,21 +388,23 @@ public class Controller {
             ArrayList<ArrayList<String>> dataaset = Stocks.getQuote(simbols);
             double changep=0;
             for(int i = 0; i<dataaset.size();i++){
-                portowlist=portowlist.replaceAll("SimbolX",simbols[i].replaceAll(".JK",""));
+                String portox;
+                portox=portowlist.replaceAll("SimbolX",simbols[i].replaceAll(".JK",""));
                 String changex=dataaset.get(i).get(4);
                 changep=changep+Double.parseDouble(changex);
-                portowlist=portowlist.replaceAll("ChangeX",changex);
+                portox=portox.replaceAll("ChangeX",changex);
                 String color="#000000";
                 if (changex.contains("+")) {
                     color="#2E7D32";
                 } else if (changex.contains("-")) {
                     color="#C62828";
                 }
-                portowlist=portowlist.replaceAll("ColorCX",color);
-                bubble=bubble.replaceAll("SeparatorSimbol",portowlist);
+                portox=portox.replaceAll("ColorCX",color);
+                bubble=bubble.replaceAll("SeparatorSimbol",portox);
             }
             bubble=bubble.replaceAll("Text1","Portofolioku");
-            bubble=bubble.replaceAll("LabaRugiX",changep+"%");
+            String changepx = String.format(changep > 0 ? "+%.2f%%" : "%.2f%%", changep);
+            bubble=bubble.replaceAll("LabaRugiX",changepx+"%");
             String color="#000000";
             if (changep>0) {
                 color="#2E7D32";
