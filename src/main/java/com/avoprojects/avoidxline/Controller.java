@@ -446,7 +446,7 @@ public class Controller {
             }
             bubble=bubble.replaceAll("Text1","Portofolioku");
             String changepx = String.format(changep > 0 ? "+%.2f%%" : "%.2f%%", changep);
-            bubble=bubble.replaceAll("LabaRugiX",changepx+"%");
+            bubble=bubble.replaceAll("LabaRugiX",changepx);
             String color="#000000";
             if (changep>0) {
                 color="#2E7D32";
@@ -463,7 +463,7 @@ public class Controller {
             ReplyMessage replyMessage= new ReplyMessage(replyToken, new FlexMessage("Portofolioku", flexContainer));
             reply(replyMessage);
         }catch(Exception e){
-            replyText(replyToken,e.getMessage());
+            replyText(replyToken,e.toString());
             //replyFallback(replyToken,14);
         }
     }
