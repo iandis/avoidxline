@@ -68,7 +68,7 @@ public class StocksAPI {
                     hsl.add(marketCap);
                     hsl.add(price);
                     hsl.add(lastchange);
-                    hsl.add(changep);
+                    hsl.add(String.valueOf(mChangep));
                     hasil.add(hsl);
                 }
                 return hasil;
