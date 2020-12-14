@@ -1,0 +1,78 @@
+{
+  "type": "bubble",
+  "header": {
+    "type": "box",
+    "layout": "vertical",
+    "contents": [
+      {
+        "type": "text",
+        "text": "Text1",
+        "color": "#FAFAFA",
+        "weight": "bold",
+        "align": "center",
+        "size": "xl"
+      }
+    ]
+  },
+  "body": {
+    "type": "box",
+    "layout": "horizontal",
+    "contents": [
+      {
+        "type": "text",
+        "text": "Laba/Rugi:",
+        "weight": "bold",
+        "align": "start"
+      },
+      {
+        "type": "text",
+        "text": "LabaRugiX",
+        "weight": "bold",
+        "align": "end",
+        "color": "ColorLR"
+      }
+    ]
+  },
+  "footer": {
+    "type": "box",
+    "layout": "vertical",
+    "spacing": "sm",
+    "contents": [
+      SeparatorSimbol
+      {
+        "type": "separator",
+        "margin": "md"
+      },
+      {
+        "type": "box",
+        "layout": "vertical",
+        "contents": [
+          {
+            "type": "button",
+            "action": {
+              "type": "message",
+              "label": "Kembali ke Menu",
+              "text": "menu"
+            },
+            "style": "primary",
+            "color": "#2196F3"
+          }
+        ]
+      },
+      {
+        "type": "spacer",
+        "size": "sm"
+      }
+    ],
+    "flex": 0
+  },
+  "styles": {
+    "header": {
+      "backgroundColor": "#0D47A1"
+    },
+    "body": {
+      "backgroundColor": "#EEEEEE"
+    }
+  }
+},
+SeparatorCarousel

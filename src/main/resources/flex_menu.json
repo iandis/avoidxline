@@ -28,8 +28,7 @@
       }
     ],
     "spacing": "none",
-    "margin": "none",
-    "backgroundColor": "#EEEEEE"
+    "margin": "none"
   },
   "footer": {
     "type": "box",
@@ -71,8 +70,18 @@
         "height": "sm",
         "action": {
           "type": "uri",
-          "label": "Intip Daftar Harga Saham",
+          "label": "Intip Daftar Saham",
           "uri": "https://www.idx.co.id/data-pasar/data-saham/daftar-saham/"
+        },
+        "color": "#2196F3"
+      },
+      {
+        "type": "button",
+        "height": "sm",
+        "action": {
+          "type": "message",
+          "label": "Daftar Kode Indeks",
+          "text": "intipindeks"
         },
         "color": "#2196F3"
       },
@@ -97,6 +106,9 @@
   "styles": {
     "header": {
       "backgroundColor": "#0D47A1"
+    },
+    "body": {
+      "backgroundColor": "#EEEEEE"
     }
   }
 }

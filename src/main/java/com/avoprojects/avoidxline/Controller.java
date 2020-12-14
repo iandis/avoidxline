@@ -43,8 +43,9 @@ public class Controller {
             "+daftar","daftar","-leave", "menu",
             "+portofolio","+watchlist",
             "portofolio","watchlist",
-            "-portofolio","-watchlist"};
-
+            "-portofolio","-watchlist",
+            "intipindex","intipindeks"};
+    private String x="❌";
     @Autowired
     @Qualifier("lineMessagingClient")
     private LineMessagingClient lineMessagingClient;
@@ -90,6 +91,11 @@ public class Controller {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
+    private void replyMenu(String replyToken){
+        ArrayList<String> msg = new ArrayList<>();
+        msg.add("default");
+        replyFlexMessage(replyToken,1,msg);
+    }
     private void greetingMsg(String replyToken,int JoinOrFollow){ //1: Join //2: Follow
         if(JoinOrFollow==1) {
             List<Message> msgArray = new ArrayList<>();
@@ -103,9 +109,7 @@ public class Controller {
             ReplyMessage replyMessage = new ReplyMessage(replyToken, msgArray);
             reply(replyMessage);
         }else if(JoinOrFollow==2){
-            ArrayList<String> msg = new ArrayList<String>();
-            msg.add("default");
-            replyFlexMessage(replyToken,1,msg);
+            replyMenu(replyToken);
         }
     }
     private void handleOneOnOneChats(MessageEvent event) {
@@ -132,7 +136,7 @@ public class Controller {
     private void handleContentMessage(MessageEvent event) {
         Random random = new Random();
         int maxrand=3;
-        int randInt=random.nextInt(maxrand);
+        int randInt=random.nextInt(maxrand+1);
         switch (randInt) {
             case 1:
                 List<Message> msgArray = new ArrayList<>();
@@ -165,24 +169,23 @@ public class Controller {
                 if (msg.toLowerCase().substring(0, keyword.length()).equals(keyword)) {
                     String symbol = "";
                     String userid = event.getSource().getUserId();
-                    StocksAPI Stocks;
+                    StocksAPI Stocks = new StocksAPI();
                     switch (keyword) {
-//                        case "jadwal uts":
-//                            replyFlexMessage(event.getReplyToken());
-//                            return;
+                        case "menu":
+                            replyMenu(event.getReplyToken());
+                            return;
                         case "saham":
                             symbol = msg.toUpperCase().substring(6); //misal teks "saham BBCA", berarti memisahkan teks "saham " dengan "BBCA"
-                            Stocks = new StocksAPI(symbol + ".JK");
-                            Stocks.join();
-                            String[] dataaset = Stocks.getSingleQuote();
-
+                            ArrayList<ArrayList<String>> dataaset=Stocks.getQuote(new String[]{symbol + ".JK"});
                             if (dataaset != null) {
                                 ArrayList<String> dataset = new ArrayList<>();
                                 dataset.add(symbol);
-                                dataset.addAll(Arrays.asList(dataaset).subList(0, 4));
-                                if (dataaset[3].contains("+")) {
+                                for(int i=0;i<4;i++){
+                                    dataset.add(dataaset.get(0).get(i));
+                                }
+                                if (dataset.get(4).contains("+")) {
                                     dataset.add("#2E7D32");
-                                } else if (dataaset[3].contains("-")) {
+                                } else if (dataset.get(4).contains("-")) {
                                     dataset.add("#C62828");
                                 } else {
                                     dataset.add("#000000");
@@ -210,19 +213,21 @@ public class Controller {
                                 } catch (Exception ignored) {
                                 }
                                 if (!idkey.equals("NA")) {
-                                    Stocks = new StocksAPI(idkey);
-                                    Stocks.join();
-                                    String[] dset = Stocks.getSingleQuote();
+                                    ArrayList<ArrayList<String>> dset=Stocks.getQuote(new String[]{idkey});
                                     ArrayList<String> dataset = new ArrayList<>();
                                     dataset.add(symbol.toUpperCase());
-                                    dataset.addAll(Arrays.asList(dset).subList(0, 4));
-                                    if (dset[3].contains("+")) {
+                                    for(int i=0;i<4;i++){
+                                        dataset.add(dset.get(0).get(i));
+                                    }
+                                    if (dataset.get(4).contains("+")) {
                                         dataset.add("#2E7D32");
-                                    } else if (dset[3].contains("-")) {
+                                    } else if (dataset.get(4).contains("-")) {
                                         dataset.add("#C62828");
                                     } else {
                                         dataset.add("#000000");
                                     }
+                                    dataset.add(symbol);
+                                    dataset.add(symbol);
                                     replyFlexMessage(event.getReplyToken(), 2, dataset);
                                 } else {
                                     replyText(event.getReplyToken(), symbol.toUpperCase() + " tidak ditemukan.");
@@ -327,7 +332,7 @@ public class Controller {
                                     } else if (nama.equals("##") && bio.equals("##")) {
                                         replyText(event.getReplyToken(),"Sukses gak ganti apa-apa:)");
                                     } else {
-                                        replyText(event.getReplyToken(),"Yah sepertinya ada yang salah dengan Avo:(");
+                                        replyFallback(event.getReplyToken(),14);
                                     }
                                 } else {
                                     replyFallback(event.getReplyToken(),2);
@@ -361,10 +366,63 @@ public class Controller {
             replyFallback(event.getReplyToken(),1);
         }
     }
+    private void replyPortoFlex(String replyToken, String uid){
+        List<PortoWatchlist> porto = Dbs.getUserPorto(uid);
+        StocksAPI Stocks = new StocksAPI();
+        if(porto==null){
+            replyFallback(replyToken,12);
+            return;
+        }
+        String[] simbols=new String[porto.size()];
+        for (int i = 0; i < porto.size(); i++) {
+            simbols[i]=porto.get(i).simbol;
+        }
+        try {
+            ClassLoader classLoader = getClass().getClassLoader();
+            String carousel = IOUtils.toString(classLoader.getResourceAsStream("carousel_flex_template.json"));
+            String bubble = IOUtils.toString(classLoader.getResourceAsStream("bubble_flex_template.json"));
+            String portowlist = IOUtils.toString(classLoader.getResourceAsStream("portowlist_fraction.json"));
+            ArrayList<ArrayList<String>> dataaset = Stocks.getQuote(simbols);
+            double changep=0;
+            for(int i = 0; i<dataaset.size();i++){
+                portowlist=portowlist.replaceAll("SimbolX",simbols[i].replaceAll(".JK",""));
+                String changex=dataaset.get(i).get(4);
+                changep=changep+Double.parseDouble(changex);
+                portowlist=portowlist.replaceAll("ChangeX",changex);
+                String color="#000000";
+                if (changex.contains("+")) {
+                    color="#2E7D32";
+                } else if (changex.contains("-")) {
+                    color="#C62828";
+                }
+                portowlist=portowlist.replaceAll("ColorCX",color);
+                bubble=bubble.replaceAll("SeparatorSimbol",portowlist);
+            }
+            bubble=bubble.replaceAll("Text1","Portofolioku");
+            bubble=bubble.replaceAll("LabaRugiX",changep+"%");
+            String color="#000000";
+            if (changep>0) {
+                color="#2E7D32";
+            } else if (changep<0) {
+                color="#C62828";
+            }
+            bubble=bubble.replaceAll("ColorLR",color);
+            bubble=bubble.replaceAll("SeparatorSimbol","");
+            bubble=bubble.replaceAll("SeparatorCarousel","");
+            carousel=carousel.replaceAll("SeparatorCarousel",bubble);
+
+            ObjectMapper objectMapper = ModelObjectMapper.createNewObjectMapper();
+            FlexContainer flexContainer = objectMapper.readValue(carousel, FlexContainer.class);
+            ReplyMessage replyMessage= new ReplyMessage(replyToken, new FlexMessage("Portofolioku", flexContainer));
+            reply(replyMessage);
+        }catch(Exception e){
+            replyFallback(replyToken,14);
+        }
+    }
     private void replyFallback(String replyToken, int Fallbackcode){
         switch(Fallbackcode){
             case 1: //keyword salah
-                ArrayList<String> arrMsg = new ArrayList<String>();
+                ArrayList<String> arrMsg = new ArrayList<>();
                 arrMsg.add("Keyword salah:(");
                 replyFlexMessage(replyToken,1,arrMsg);
                 break;
@@ -426,6 +484,15 @@ public class Controller {
                 multimsg5.add("Misalnya: \n+daftar Avo's IDX\n+bio Yuk Nabung Saham!\nNama & bio gak boleh kosong ya. Untuk nama maksimal 20 karakter, kalau bio maksimal 30 karakter.");
                 replyMultiMsg(replyToken, multimsg5);
                 break;
+            case 12: //porto kosong
+                replyText(replyToken,"Aduh, portofolio kamu masih kosong:(");
+                break;
+            case 13: //watchlist kosong
+                replyText(replyToken,"Aduh, watchlist kamu masih kosong:(");
+                break;
+            case 14: //unknown error
+                replyText(replyToken,"Yah sepertinya ada yang salah dengan Avo:(");
+                break;
         }
     }
     private void replyFlexMessage(String replyToken, int flextype, ArrayList<String> flexText) {
@@ -435,20 +502,18 @@ public class Controller {
             String flexTemplate; FlexContainer flexContainer; ReplyMessage replyMessage=null;
             ObjectMapper objectMapper = ModelObjectMapper.createNewObjectMapper();
             if(flextype==1) {
-                if(flexText.get(0).equals("default")) {
-                    List<Message> msgArray = new ArrayList<>();
-                    flexTemplate = IOUtils.toString(classLoader.getResourceAsStream("flex_menu.json"));
-                    flexContainer = objectMapper.readValue(flexTemplate, FlexContainer.class);
-                    msgArray.add(new FlexMessage("Menu", flexContainer));
-                    replyMessage = new ReplyMessage(replyToken, msgArray);
-                }else{
-                    List<Message> msgArray = new ArrayList<>();
-                    flexTemplate = IOUtils.toString(classLoader.getResourceAsStream("flex_menu.json"));
-                    flexContainer = objectMapper.readValue(flexTemplate, FlexContainer.class);
+                List<Message> msgArray = new ArrayList<>();
+                flexTemplate = IOUtils.toString(classLoader.getResourceAsStream("flex_menu.json"));
+                flexContainer = objectMapper.readValue(flexTemplate, FlexContainer.class);
+                if(!flexText.get(0).equals("default")) {
                     msgArray.add(new TextMessage(flexText.get(0)));
-                    msgArray.add(new FlexMessage("Menu", flexContainer));
-                    replyMessage = new ReplyMessage(replyToken, msgArray);
                 }
+                msgArray.add(new FlexMessage("Menu", flexContainer));
+                msgArray.add(new TextMessage("Tips:\nKamu bisa cari kode saham yang mau kamu cek dengan memilih \"Intip Daftar Saham\". Setelah dapat, kamu bisa cek performa nya dengan keyword:"));
+                msgArray.add(new TextMessage("saham kodesaham"));
+                msgArray.add(new TextMessage("Kamu juga bisa intip beberapa indeks dengan memilih \"Daftar Kode Indeks\". Setelah itu, kamu bisa cek performa nya dengan keyword:"));
+                msgArray.add(new TextMessage("index kodeindex"));
+                replyMessage = new ReplyMessage(replyToken, msgArray);
             }else if(flextype==2){
                 flexTemplate = IOUtils.toString(classLoader.getResourceAsStream("flex_stock.json"));
                 for(int i=1; i<=flexText.size();i++){
