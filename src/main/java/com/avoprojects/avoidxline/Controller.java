@@ -463,8 +463,8 @@ public class Controller {
             ReplyMessage replyMessage= new ReplyMessage(replyToken, new FlexMessage("Portofolioku", flexContainer));
             reply(replyMessage);
         }catch(Exception e){
-            //replyText(replyToken,e.toString());
-            replyFallback(replyToken,14);
+            replyText(replyToken,e.toString());
+            //replyFallback(replyToken,14);
         }
     }
     private void replyFallback(String replyToken, int Fallbackcode){
