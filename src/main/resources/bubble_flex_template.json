@@ -42,8 +42,9 @@
     "contents": [
       SeparatorSimbol
       {
-        "type": "spacer",
-        "size": "md"
+        "type": "separator",
+        "margin": "md",
+        "color": "#FFFFFF"
       },
       {
         "type": "box",
