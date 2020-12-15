@@ -1,114 +1,117 @@
 {
-  "type": "bubble",
-  "header": {
-    "type": "box",
-    "layout": "vertical",
-    "contents": [
-      {
-        "type": "text",
-        "text": "Avo",
-        "color": "#FAFAFA",
-        "weight": "bold",
-        "align": "center",
-        "size": "xl"
+  "type": "carousel",
+  "contents": [
+    {
+      "type": "bubble",
+      "header": {
+        "type": "box",
+        "layout": "vertical",
+        "contents": [
+          {
+            "type": "text",
+            "text": "Avo",
+            "color": "#FAFAFA",
+            "weight": "bold",
+            "align": "center",
+            "size": "xl"
+          }
+        ]
+      },
+      "body": {
+        "type": "box",
+        "layout": "vertical",
+        "contents": [
+          {
+            "type": "text",
+            "text": "Hai! Ada yang bisa aku bantu?",
+            "weight": "bold",
+            "size": "md",
+            "margin": "none",
+            "wrap": true
+          }
+        ]
+      },
+      "footer": {
+        "type": "box",
+        "layout": "vertical",
+        "spacing": "sm",
+        "contents": [
+          {
+            "type": "button",
+            "height": "sm",
+            "action": {
+              "type": "message",
+              "label": "Lihat Profile",
+              "text": "profile"
+            },
+            "color": "#2196F3"
+          },
+          {
+            "type": "button",
+            "height": "sm",
+            "action": {
+              "type": "message",
+              "label": "Watchlist",
+              "text": "watchlist"
+            },
+            "color": "#2196F3"
+          },
+          {
+            "type": "button",
+            "height": "sm",
+            "action": {
+              "type": "message",
+              "label": "Portofolio",
+              "text": "portofolio"
+            },
+            "color": "#2196F3"
+          },
+          {
+            "type": "button",
+            "height": "sm",
+            "action": {
+              "type": "uri",
+              "label": "Intip Daftar Saham",
+              "uri": "https://www.idx.co.id/data-pasar/data-saham/daftar-saham/"
+            },
+            "color": "#2196F3"
+          },
+          {
+            "type": "button",
+            "height": "sm",
+            "action": {
+              "type": "message",
+              "label": "Daftar Kode Indeks",
+              "text": "intipindeks"
+            },
+            "color": "#2196F3"
+          },
+          {
+            "type": "button",
+            "height": "sm",
+            "action": {
+              "type": "message",
+              "label": "Daftar",
+              "text": "daftar"
+            },
+            "color": "#2196F3",
+            "style": "primary"
+          },
+          {
+            "type": "spacer",
+            "size": "sm"
+          }
+        ],
+        "flex": 0
+      },
+      "styles": {
+        "header": {
+          "backgroundColor": "#0D47A1"
+        },
+        "body": {
+          "backgroundColor": "#EEEEEE"
+        }
       }
-    ]
-  },
-  "body": {
-    "type": "box",
-    "layout": "vertical",
-    "contents": [
-      {
-        "type": "text",
-        "text": "Hai! Ada yang bisa aku bantu?",
-        "weight": "bold",
-        "size": "md",
-        "margin": "none",
-        "wrap": true
-      }
-    ],
-    "spacing": "none",
-    "margin": "none"
-  },
-  "footer": {
-    "type": "box",
-    "layout": "vertical",
-    "spacing": "sm",
-    "contents": [
-      {
-        "type": "button",
-        "height": "sm",
-        "action": {
-          "type": "message",
-          "label": "Lihat Profile",
-          "text": "profile"
-        },
-        "color": "#2196F3"
-      },
-      {
-        "type": "button",
-        "height": "sm",
-        "action": {
-          "type": "message",
-          "label": "Watchlist",
-          "text": "watchlist"
-        },
-        "color": "#2196F3"
-      },
-      {
-        "type": "button",
-        "height": "sm",
-        "action": {
-          "type": "message",
-          "label": "Portofolio",
-          "text": "portofolio"
-        },
-        "color": "#2196F3"
-      },
-      {
-        "type": "button",
-        "height": "sm",
-        "action": {
-          "type": "uri",
-          "label": "Intip Daftar Saham",
-          "uri": "https://www.idx.co.id/data-pasar/data-saham/daftar-saham/"
-        },
-        "color": "#2196F3"
-      },
-      {
-        "type": "button",
-        "height": "sm",
-        "action": {
-          "type": "message",
-          "label": "Daftar Kode Indeks",
-          "text": "intipindeks"
-        },
-        "color": "#2196F3"
-      },
-      {
-        "type": "button",
-        "height": "sm",
-        "action": {
-          "type": "message",
-          "label": "Daftar",
-          "text": "daftar"
-        },
-        "color": "#2196F3",
-        "style": "primary"
-      },
-      {
-        "type": "spacer",
-        "size": "sm"
-      }
-    ],
-    "flex": 0
-  },
-  "styles": {
-    "header": {
-      "backgroundColor": "#0D47A1"
-    },
-    "body": {
-      "backgroundColor": "#EEEEEE"
-    }
-  }
+    },SeparatorBubble
+  ]
 }

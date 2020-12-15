@@ -1,0 +1,38 @@
+{
+  "type": "bubble",
+  "header": {
+    "type": "box",
+    "layout": "vertical",
+    "contents": [
+      {
+        "type": "text",
+        "text": "Top Watchlist",
+        "color": "#FAFAFA",
+        "weight": "bold",
+        "align": "center",
+        "size": "xl"
+      }
+    ]
+  },
+  "footer": {
+    "type": "box",
+    "layout": "vertical",
+    "spacing": "sm",
+    "contents": [
+      SeparatorSimbol
+      {
+        "type": "spacer",
+        "size": "sm"
+      }
+    ],
+    "flex": 0
+  },
+  "styles": {
+    "header": {
+      "backgroundColor": "#0D47A1"
+    },
+    "body": {
+      "backgroundColor": "#EEEEEE"
+    }
+  }
+},SeparatorCarousel

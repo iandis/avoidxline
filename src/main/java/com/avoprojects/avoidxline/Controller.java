@@ -45,8 +45,7 @@ public class Controller {
             "portofolio","watchlist",
             "-portofolio","-watchlist",
             "intipindex","intipindeks"};
-    //private String x="❌";
-    private static String tblPorto="\\{\"type\":\"button\",\"height\":\"md\",\"action\":\\{\"type\":\"message\",\"label\":\"Tambah ke Portofolio\",\"text\":\"+portofolio Text7\"},\"color\":\"#2196F3\"},";
+    //private String plus="➕";
     @Autowired
     @Qualifier("lineMessagingClient")
     private LineMessagingClient lineMessagingClient;
@@ -178,6 +177,10 @@ public class Controller {
                         case "menu":
                             replyMenu(event.getReplyToken());
                             return;
+                        case "intipindex":
+                        case "intipindeks":
+                            replyFlexIndices(event.getReplyToken());
+                            return;
                         case "watchlist":
                             replyWlistFlex(event.getReplyToken(),userid);
                             return;
@@ -190,7 +193,7 @@ public class Controller {
                                 if (dataaset != null) {
                                     int b = Dbs.insertWlist(userid,sim);
                                     if(b>0) {
-                                        replyText(event.getReplyToken(), "Yeay! Berhasil menambahkan " + symbol + " ke watchlist kamu.");
+                                        replyWlistFlex(event.getReplyToken(),userid, "Yeay! Berhasil menambahkan " + symbol + " ke watchlist kamu.");
                                     }else if(b==-1){
                                         replyFallback(event.getReplyToken(),18); //simbol sudah ada
                                     }else if(b==-2){
@@ -212,7 +215,7 @@ public class Controller {
                                 String sim=isidx.equals("NA") ? symbol + ".JK" : isidx;
                                 int b = Dbs.deleteWlist(userid,sim);
                                 if (b>0) {
-                                    replyText(event.getReplyToken(), symbol + " berhasil dihapus dari watchlist kamu.");
+                                    replyWlistFlex(event.getReplyToken(),userid, symbol + " berhasil dihapus dari watchlist kamu.");
                                 }else if(b==-1){
                                     replyFallback(event.getReplyToken(),13); //Watchlist kosong
                                 }else if(b==-2){
@@ -238,7 +241,7 @@ public class Controller {
                                 if (dataaset != null) {
                                     int b = Dbs.insertPorto(userid,symbol+".JK");
                                     if(b>0) {
-                                        replyText(event.getReplyToken(), "Yeay! Berhasil menambahkan " + symbol + " ke portofolio kamu.");
+                                        replyPortoFlex(event.getReplyToken(),userid, "Yeay! Berhasil menambahkan " + symbol + " ke portofolio kamu.");
                                     }else if(b==-1){
                                         replyFallback(event.getReplyToken(),17); //simbol sudah ada
                                     }else if(b==-2){
@@ -258,7 +261,7 @@ public class Controller {
                                 symbol = msg.toUpperCase().substring("-portofolio ".length());
                                 int b = Dbs.deletePorto(userid,symbol+".JK");
                                 if (b>0) {
-                                    replyText(event.getReplyToken(), symbol + " berhasil dihapus dari portofolio kamu.");
+                                    replyPortoFlex(event.getReplyToken(),userid,symbol + " berhasil dihapus dari portofolio kamu.");
                                 }else if(b==-1){
                                     replyFallback(event.getReplyToken(),12); //porto kosong
                                 }else if(b==-2){
@@ -452,6 +455,63 @@ public class Controller {
             replyFallback(event.getReplyToken(),1);
         }
     }
+    private void replyFlexIndices(String replyToken){
+        try {
+            ClassLoader classLoader = getClass().getClassLoader();
+            String flexTemplate=IOUtils.toString(classLoader.getResourceAsStream("carousel_flex_template.json"));
+            JSONObject yfjson = new JSONObject(flexTemplate);
+            Iterator<String> it = yfjson.keys();
+            String[]twlist = new String[36];
+            int j=0;
+            while (it.hasNext()) {
+                twlist[j] = it.next();j++;
+            }
+            StocksAPI Stocks = new StocksAPI();
+            ArrayList<ArrayList<String>> dataaset = Stocks.getQuote(twlist);
+            String flextwlist = IOUtils.toString(classLoader.getResourceAsStream("flex_topwlist.json"));
+            String twlistbubble = IOUtils.toString(classLoader.getResourceAsStream("flex_topwlist_bubble.json"));
+            for (int i = 0; i < 36; i++) {
+                String ftw = flextwlist;
+                ftw = ftw.replaceAll("SimbolX", yfjson.getString(twlist[i]).toUpperCase());
+                double changex = Double.parseDouble(dataaset.get(i).get(4));
+                String changepx = String.format(changex > 0 ? "+%.2f%%" : "%.2f%%", changex);
+                ftw = ftw.replaceAll("ChangeX", changepx);
+                String color = "#000000";
+                if (changex > 0) {
+                    color = "#2E7D32"; //hijau
+                } else if (changex < 0) {
+                    color = "#C62828"; //merah
+                }
+                ftw = ftw.replaceAll("ColorCX", color);
+                String shortName = dataaset.get(i).get(0);
+                if (shortName.equals("N/A")) {
+                    String simx = dataaset.get(i).get(5);
+                    if (simx.contains("^JK")) {
+                        shortName = simx.substring(simx.indexOf("^JK") + "^JK".length());
+                    } else if (simx.contains(".JK")) {
+                        shortName = simx.replaceAll(".JK", "");
+                    } else {
+                        shortName = simx;
+                    }
+                }
+                ftw = ftw.replaceAll("shortNameX", shortName);
+                if((i+1) % 6 == 0){
+                    String bub = twlistbubble;
+                    twlistbubble = twlistbubble.replaceAll("SeparatorSimbol","");
+                    twlistbubble = twlistbubble.replaceAll("SeparatorCarousel",bub);
+                }
+                twlistbubble = twlistbubble.replaceAll("SeparatorSimbol", ftw);
+            }
+            twlistbubble = twlistbubble.replaceAll("SeparatorSimbol", "");
+            twlistbubble = twlistbubble.replaceAll(",SeparatorCarousel", "");
+            twlistbubble = twlistbubble.replaceAll("Top Watchlist","Daftar Kode Indeks");
+            flexTemplate = flexTemplate.replaceAll("SeparatorCarousel", twlistbubble);
+            ObjectMapper objectMapper = ModelObjectMapper.createNewObjectMapper();
+            FlexContainer flexContainer = objectMapper.readValue(flexTemplate, FlexContainer.class);
+            ReplyMessage replyMessage= new ReplyMessage(replyToken,new FlexMessage("Daftar Kode Indeks",flexContainer));
+            reply(replyMessage);
+        }catch(Exception ignored){}
+    }
     private String isIndex(String simbol){
         return isIndex(simbol,1);
     }
@@ -474,17 +534,23 @@ public class Controller {
         }
         return idkey;
     }
+    private void replyPortoFlex(String replyToken, String uid, String msg){
+        replyPWFlex(replyToken,uid,1,msg);
+    }
     private void replyPortoFlex(String replyToken, String uid){
-        replyPWFlex(replyToken,uid,1);
+        replyPWFlex(replyToken,uid,1,"default");
+    }
+    private void replyWlistFlex(String replyToken, String uid, String msg){
+        replyPWFlex(replyToken,uid,2,msg);
     }
     private void replyWlistFlex(String replyToken, String uid){
-        replyPWFlex(replyToken,uid,2);
+        replyPWFlex(replyToken,uid,2,"default");
     }
-    private void replyPWFlex(String replyToken, String uid, int PW){ //1:porto 2:watchlist
+    private void replyPWFlex(String replyToken, String uid, int PW,String additionalMsg){ //1:porto 2:watchlist
         List<PortoWatchlist> porto = (PW == 1 ? Dbs.getUserPorto(uid) : Dbs.getUserWlist(uid));
         StocksAPI Stocks = new StocksAPI();
         if(porto.size()==0){
-            replyFallback(replyToken,PW==1 ? 12 : 13) ;
+            if(additionalMsg.equals("default")){replyFallback(replyToken,PW==1 ? 12 : 13);}
             return;
         }
         String[] simbols=new String[porto.size()];
@@ -508,7 +574,7 @@ public class Controller {
                     if(!simidx.equals("NA")){
                         portox=portox.replaceAll("saham SimbolX","index SimbolX");
                         portox=portox.replaceAll("-portofolio SimbolX","-watchlist SimbolX");
-                        portox=portox.replaceAll("SimbolX",simidx);
+                        portox=portox.replaceAll("SimbolX",simidx.toUpperCase());
                     }else{
                         portox = portox.replaceAll("SimbolX", simbols[i].replaceAll(".JK", ""));
                     }
@@ -527,7 +593,7 @@ public class Controller {
                 if(shortName.equals("N/A")){
                     String sim = dataaset.get(i).get(5);
                     if(sim.contains("^JK")){
-                        shortName=sim.replaceAll("\\^JK","");
+                        shortName=sim.substring(sim.indexOf("^JK")+"^JK".length());
                     }else if(sim.contains(".JK")){
                         shortName=sim.replaceAll(".JK","");
                     }else{
@@ -538,6 +604,7 @@ public class Controller {
                 portox=portox.replaceAll("ColorCX",color);
                 if(i==10){
                     String bub = bubble;
+                    bubble = bubble.replaceAll("SeparatorSimbol","");
                     bubble = bubble.replaceAll("SeparatorCarousel",bub);
                 }
                 bubble = bubble.replaceAll("SeparatorSimbol", portox);
@@ -556,10 +623,16 @@ public class Controller {
             bubble=bubble.replaceAll("SeparatorSimbol","");
             bubble=bubble.replaceAll(",SeparatorCarousel","");
             carousel=carousel.replaceAll("SeparatorCarousel",bubble);
-
+            if(PW==2){
+                carousel=carousel.replaceAll("Laba/Rugi:", "Kode");
+                carousel=carousel.replaceAll("LabaRugiX", "Perubahan");
+            }
             ObjectMapper objectMapper = ModelObjectMapper.createNewObjectMapper();
             FlexContainer flexContainer = objectMapper.readValue(carousel, FlexContainer.class);
-            ReplyMessage replyMessage= new ReplyMessage(replyToken, new FlexMessage(PW==1 ? "Portofolioku":"Watchlistku", flexContainer));//new TextMessage(carousel));
+            List<Message> rep = new ArrayList<>();
+            rep.add(new FlexMessage(PW==1 ? "Portofolioku":"Watchlistku", flexContainer));
+            if(!additionalMsg.equals("default")){rep.add(new TextMessage(additionalMsg));}
+            ReplyMessage replyMessage= new ReplyMessage(replyToken,rep);
             reply(replyMessage);
         }catch(Exception e){
             //replyText(replyToken,e.toString());
@@ -657,6 +730,59 @@ public class Controller {
                 break;
         }
     }
+    private String getTwList(String flexTemp){
+        String flexTemplate=flexTemp;
+        try {
+            ClassLoader classLoader = getClass().getClassLoader();
+            List<TopWatchlist> twlist = Dbs.getTopWatchlist();
+            int dtsize = twlist.size();
+            if (dtsize == 0) {
+                flexTemplate = flexTemplate.replaceAll(",SeparatorBubble", "");
+            } else {
+                String[] simbols = new String[Math.min(dtsize, 5)];
+                for (int i = 0; i < Math.min(dtsize, 5); i++) {
+                    simbols[i] = twlist.get(i).simbol;
+                }
+                StocksAPI Stocks = new StocksAPI();
+                ArrayList<ArrayList<String>> dataaset = Stocks.getQuote(simbols);
+                String flextwlist = IOUtils.toString(classLoader.getResourceAsStream("flex_topwlist.json"));
+                String twlistbubble = IOUtils.toString(classLoader.getResourceAsStream("flex_topwlist_bubble.json"));
+                for (int i = 0; i < Math.min(dtsize, 5); i++) {
+                    String ftw = flextwlist;
+                    String sim = isIndex(simbols[i], 2);
+                    ftw = ftw.replaceAll("SimbolX", sim.equals("NA") ? simbols[i].replaceAll(".JK", "") : sim.toUpperCase());
+                    double changex = Double.parseDouble(dataaset.get(i).get(4));
+                    String changepx = String.format(changex > 0 ? "+%.2f%%" : "%.2f%%", changex);
+                    ftw = ftw.replaceAll("ChangeX", changepx);
+                    String color = "#000000";
+                    if (changex > 0) {
+                        color = "#2E7D32"; //hijau
+                    } else if (changex < 0) {
+                        color = "#C62828"; //merah
+                    }
+                    ftw = ftw.replaceAll("ColorCX", color);
+                    String shortName = dataaset.get(i).get(0);
+                    if (shortName.equals("N/A")) {
+                        String simx = dataaset.get(i).get(5);
+                        if (simx.contains("^JK")) {
+                            shortName = simx.substring(simx.indexOf("^JK") + "^JK".length());
+                        } else if (simx.contains(".JK")) {
+                            shortName = simx.replaceAll(".JK", "");
+                        } else {
+                            shortName = simx;
+                        }
+                    }
+                    ftw = ftw.replaceAll("shortNameX", shortName);
+                    twlistbubble = twlistbubble.replaceAll("SeparatorSimbol", ftw);
+                }
+                twlistbubble = twlistbubble.replaceAll("SeparatorSimbol", "");
+                twlistbubble = twlistbubble.replaceAll(",SeparatorCarousel", "");
+                flexTemplate = flexTemplate.replaceAll("SeparatorBubble", twlistbubble);
+
+            }
+        }catch(Exception ignored){}
+        return flexTemplate;
+    }
     private void replyFlexMessage(String replyToken, int flextype, ArrayList<String> flexText) {
         try {
             //1: Menu awal, 2: Stock, 3: Profile, 4: Portofolio, 5: Watchlist
@@ -666,6 +792,7 @@ public class Controller {
             if(flextype==1) {
                 List<Message> msgArray = new ArrayList<>();
                 flexTemplate = IOUtils.toString(classLoader.getResourceAsStream("flex_menu.json"));
+                flexTemplate = getTwList(flexTemplate);
                 flexContainer = objectMapper.readValue(flexTemplate, FlexContainer.class);
                 if(!flexText.get(0).equals("default")) {
                     msgArray.add(new TextMessage(flexText.get(0)));
@@ -680,7 +807,10 @@ public class Controller {
                 flexTemplate = IOUtils.toString(classLoader.getResourceAsStream("flex_stock.json"));
                 for(int i=1; i<=flexText.size();i++){
                     if(i==7 && !isIndex(flexText.get(0).toLowerCase()).equals("NA")){
-                        flexTemplate=flexTemplate.replaceAll(tblPorto,"");
+                        String tblPorto = "{\"type\":\"button\",\"height\":\"md\",\"action\":{\"type\":\"message\",\"label\":\"Tambah ke Portofolio\",\"text\":\"+portofolio Text7\"},\"color\":\"#2196F3\"},";
+                        String s1 =flexTemplate.substring(0,flexTemplate.indexOf(tblPorto));
+                        String s2 =flexTemplate.substring(flexTemplate.indexOf(tblPorto)+ tblPorto.length());
+                        flexTemplate=s1+s2;
                     }else {
                         flexTemplate = flexTemplate.replaceAll("Text" + i, i==2 ? (flexText.get(1).equals("N/A") ? flexText.get(0) + " Index" : flexText.get(1)) : flexText.get(i-1));
                     }

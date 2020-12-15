@@ -36,8 +36,8 @@ public class DbSvc {
         }
     }
     public int insertWlist(String uid,String simbol){
-        PortoWatchlist wlist = mDao.findPortoSimbol(uid,simbol);
-        int wsize=mDao.getUserPorto(uid).size();
+        PortoWatchlist wlist = mDao.findWlistSimbol(uid,simbol);
+        int wsize=mDao.getUserWlist(uid).size();
         if(wlist == null){
             if(wsize<20) {
                 return mDao.insWlist(uid, simbol);
@@ -62,8 +62,8 @@ public class DbSvc {
         }
     }
     public int deleteWlist(String uid,String simbol){
-        PortoWatchlist wlist = mDao.findPortoSimbol(uid,simbol);
-        int wsize=mDao.getUserPorto(uid).size();
+        PortoWatchlist wlist = mDao.findWlistSimbol(uid,simbol);
+        int wsize=mDao.getUserWlist(uid).size();
         if(wsize>0){
             if(wlist != null){
                 return mDao.delWlistSimbol(uid,simbol);

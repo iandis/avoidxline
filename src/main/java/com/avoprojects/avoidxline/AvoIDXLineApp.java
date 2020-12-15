@@ -152,8 +152,6 @@ public class AvoIDXLineApp {
 //		}
 //		jsonDataString=jsonDataString.replaceAll("SeparatorSimbol","");*/
 //		System.out.print(tambahan);
-
-		//System.out.print("\173");
 		SpringApplication.run(AvoIDXLineApp.class, args);
 	}
 }

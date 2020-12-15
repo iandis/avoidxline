@@ -32,8 +32,8 @@
         "color": "ColorLR"
       }
     ],
-    "paddingStart": "3%",
-    "paddingEnd": "3%"
+    "paddingStart": "2%",
+    "paddingEnd": "2%"
   },
   "footer": {
     "type": "box",

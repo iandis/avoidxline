@@ -1,0 +1,54 @@
+{
+  "type": "box",
+  "layout": "vertical",
+  "contents": [
+    {
+      "type": "box",
+      "layout": "baseline",
+      "contents": [
+        {
+          "type": "text",
+          "text": "SimbolX",
+          "flex": 1,
+          "color": "#2196F3",
+          "weight": "bold",
+          "align": "start",
+          "action": {
+            "type": "message",
+            "text": "saham SimbolX"
+          },
+          "size": "lg"
+        },
+        {
+          "type": "text",
+          "text": "ChangeX",
+          "flex": 1,
+          "align": "end",
+          "color": "ColorCX"
+        },
+        {
+          "type": "text",
+          "flex": 0,
+          "weight": "bold",
+          "action": {
+            "type": "message",
+            "text": "+watchlist SimbolX"
+          },
+          "text": "➕"
+        }
+      ]
+    },
+    {
+      "type": "box",
+      "layout": "vertical",
+      "contents": [
+        {
+          "type": "text",
+          "text": "(shortNameX)",
+          "color": "#616161"
+        }
+      ]
+    }
+  ]
+},
+SeparatorSimbol

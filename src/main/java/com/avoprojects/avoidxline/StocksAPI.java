@@ -42,7 +42,6 @@ public class StocksAPI {
             //Read JSON response and print
             JSONObject yfjson = new JSONObject(response.toString());
             JSONArray yfresult = yfjson.getJSONObject("quoteResponse").getJSONArray("result");//.getJSONObject(0);
-
             if (yfresult.isEmpty()) {
                 return null;
             } else {
