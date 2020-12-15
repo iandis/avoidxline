@@ -542,24 +542,24 @@ public class Controller {
                 }
                 bubble = bubble.replaceAll("SeparatorSimbol", portox);
             }
-            bubble=bubble.replaceAll("Text1","Portofolioku");
+            bubble=bubble.replaceAll("Text1",PW==1 ? "Portofolioku":"Watchlistku");
             changep=changep/dtsize;
             String changepx = String.format(changep > 0 ? "+%.2f%%" : "%.2f%%", changep);
-            bubble=bubble.replaceAll("LabaRugiX",changepx);
+            bubble=bubble.replaceAll("LabaRugiX",PW==1 ? changepx : "--");
             String color="#000000";
             if (changep>0) {
                 color="#2E7D32";
             } else if (changep<0) {
                 color="#C62828";
             }
-            bubble=bubble.replaceAll("ColorLR",color);
+            bubble=bubble.replaceAll("ColorLR",PW==1 ?color : "#000000");
             bubble=bubble.replaceAll("SeparatorSimbol","");
             bubble=bubble.replaceAll(",SeparatorCarousel","");
             carousel=carousel.replaceAll("SeparatorCarousel",bubble);
 
             ObjectMapper objectMapper = ModelObjectMapper.createNewObjectMapper();
             FlexContainer flexContainer = objectMapper.readValue(carousel, FlexContainer.class);
-            ReplyMessage replyMessage= new ReplyMessage(replyToken, new FlexMessage("Portofolioku", flexContainer));//new TextMessage(carousel));
+            ReplyMessage replyMessage= new ReplyMessage(replyToken, new FlexMessage(PW==1 ? "Portofolioku":"Watchlistku", flexContainer));//new TextMessage(carousel));
             reply(replyMessage);
         }catch(Exception e){
             //replyText(replyToken,e.toString());
