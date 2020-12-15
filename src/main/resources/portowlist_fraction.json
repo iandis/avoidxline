@@ -1,35 +1,52 @@
 {
   "type": "box",
-  "layout": "baseline",
+  "layout": "vertical",
   "contents": [
     {
-      "type": "text",
-      "text": "SimbolX",
-      "flex": 1,
-      "color": "#2196F3",
-      "weight": "bold",
-      "align": "start",
-      "action": {
-        "type": "message",
-        "text": "saham SimbolX"
-      }
+      "type": "box",
+      "layout": "baseline",
+      "contents": [
+        {
+          "type": "text",
+          "text": "SimbolX",
+          "flex": 1,
+          "color": "#2196F3",
+          "weight": "bold",
+          "align": "start",
+          "action": {
+            "type": "message",
+            "text": "saham SimbolX"
+          }
+        },
+        {
+          "type": "text",
+          "text": "ChangeX",
+          "flex": 1,
+          "align": "end",
+          "color": "ColorCX"
+        },
+        {
+          "type": "text",
+          "flex": 0,
+          "weight": "bold",
+          "text": "❌",
+          "action": {
+            "type": "message",
+            "text": "-portofolio SimbolX"
+          }
+        }
+      ]
     },
     {
-      "type": "text",
-      "text": "ChangeX",
-      "flex": 1,
-      "align": "end",
-      "color": "ColorCX"
-    },
-    {
-      "type": "text",
-      "flex": 0,
-      "weight": "bold",
-      "text": "❌",
-      "action": {
-        "type": "message",
-        "text": "-portofolio SimbolX"
-      }
+      "type": "box",
+      "layout": "vertical",
+      "contents": [
+        {
+          "type": "text",
+          "text": "(shortNameX)",
+          "color": "#616161"
+        }
+      ]
     }
   ]
 },

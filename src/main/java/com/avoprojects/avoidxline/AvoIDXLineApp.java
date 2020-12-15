@@ -19,7 +19,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
 public class AvoIDXLineApp {
-
+	//private static String tblPorto="{\"type\":\"button\",\"height\":\"md\",\"action\":{\"type\":\"message\",\"label\":\"Tambah ke Portofolio\",\"text\":\"+portofolio Text7\"},\"color\":\"#2196F3\"},";
 	public static void main(String[] args) {
 //		String jsonDataString = "{\n" +
 //				"  \"type\": \"carousel\",\n" +
@@ -152,6 +152,8 @@ public class AvoIDXLineApp {
 //		}
 //		jsonDataString=jsonDataString.replaceAll("SeparatorSimbol","");*/
 //		System.out.print(tambahan);
+
+		//System.out.print("\173");
 		SpringApplication.run(AvoIDXLineApp.class, args);
 	}
 }

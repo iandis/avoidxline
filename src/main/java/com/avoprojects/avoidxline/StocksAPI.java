@@ -49,15 +49,17 @@ public class StocksAPI {
                 String change, changep, marketCap, shortName, price, lastchange;
                 ArrayList<ArrayList<String>> hasil = new ArrayList<>();
                 for(int i=0; i<yfresult.length();i++) {
-                    shortName = yfresult.getJSONObject(i).getString("shortName");
+                    String simbol = yfresult.getJSONObject(i).getString("symbol");
                     double mPrice = yfresult.getJSONObject(i).getDouble("regularMarketPrice");
                     double mChange = yfresult.getJSONObject(i).getDouble("regularMarketChange");
                     double mChangep = yfresult.getJSONObject(i).getDouble("regularMarketChangePercent");
                     try {
                         double mMarketcap = yfresult.getJSONObject(i).getDouble("marketCap");
                         marketCap = formatMarketCap(mMarketcap);
+                        shortName = yfresult.getJSONObject(i).getString("shortName");
                     } catch (Exception e) {
                         marketCap = "N/A";
+                        shortName = "N/A";
                     }
                     price = String.format("%.2f", mPrice);
                     change = String.format(mChange > 0 ? "+%.2f" : "%.2f", mChange);
@@ -69,6 +71,7 @@ public class StocksAPI {
                     hsl.add(price);
                     hsl.add(lastchange);
                     hsl.add(String.valueOf(mChangep));
+                    hsl.add(simbol);
                     hasil.add(hsl);
                 }
                 return hasil;

@@ -45,7 +45,8 @@ public class Controller {
             "portofolio","watchlist",
             "-portofolio","-watchlist",
             "intipindex","intipindeks"};
-    private String x="❌";
+    //private String x="❌";
+    private static String tblPorto="\\{\"type\":\"button\",\"height\":\"md\",\"action\":\\{\"type\":\"message\",\"label\":\"Tambah ke Portofolio\",\"text\":\"+portofolio Text7\"},\"color\":\"#2196F3\"},";
     @Autowired
     @Qualifier("lineMessagingClient")
     private LineMessagingClient lineMessagingClient;
@@ -177,12 +178,62 @@ public class Controller {
                         case "menu":
                             replyMenu(event.getReplyToken());
                             return;
+                        case "watchlist":
+                            replyWlistFlex(event.getReplyToken(),userid);
+                            return;
+                        case "+watchlist":
+                            if(Dbs.isUserExist(userid)){
+                                symbol = msg.toUpperCase().substring("+watchlist ".length());
+                                String isidx = isIndex(symbol.toLowerCase());
+                                String sim=isidx.equals("NA") ? symbol + ".JK" : isidx;
+                                ArrayList<ArrayList<String>> dataaset=Stocks.getQuote(new String[]{sim});
+                                if (dataaset != null) {
+                                    int b = Dbs.insertWlist(userid,sim);
+                                    if(b>0) {
+                                        replyText(event.getReplyToken(), "Yeay! Berhasil menambahkan " + symbol + " ke watchlist kamu.");
+                                    }else if(b==-1){
+                                        replyFallback(event.getReplyToken(),18); //simbol sudah ada
+                                    }else if(b==-2){
+                                        replyFallback(event.getReplyToken(),16); //porto penuh
+                                    }else{
+                                        replyFallback(event.getReplyToken(),14);
+                                    }
+                                }else{
+                                    replyText(event.getReplyToken(), "Index " +symbol + " tidak ditemukan.");
+                                }
+                            }else{
+                                replyFallback(event.getReplyToken(),3);
+                            }
+                            return;
+                        case "-watchlist":
+                            if(Dbs.isUserExist(userid)){
+                                symbol = msg.toUpperCase().substring("-watchlist ".length());
+                                String isidx = isIndex(symbol.toLowerCase());
+                                String sim=isidx.equals("NA") ? symbol + ".JK" : isidx;
+                                int b = Dbs.deleteWlist(userid,sim);
+                                if (b>0) {
+                                    replyText(event.getReplyToken(), symbol + " berhasil dihapus dari watchlist kamu.");
+                                }else if(b==-1){
+                                    replyFallback(event.getReplyToken(),13); //Watchlist kosong
+                                }else if(b==-2){
+                                    replyText(event.getReplyToken(), symbol + " tidak ditemukan di watchlist kamu."); //simbol tidak ditemukan
+                                }else{
+                                    replyFallback(event.getReplyToken(),14);
+                                }
+                            }else{
+                                replyFallback(event.getReplyToken(),3);
+                            }
+                            return;
                         case "portofolio":
                             replyPortoFlex(event.getReplyToken(),userid);
                             return;
                         case "+portofolio":
                             if(Dbs.isUserExist(userid)){
                                 symbol = msg.toUpperCase().substring("+portofolio ".length());
+                                if(!isIndex(symbol).equals("NA")){
+                                    replyFallback(event.getReplyToken(),19); //indeks tidak bsa di porto
+                                    return;
+                                }
                                 ArrayList<ArrayList<String>> dataaset=Stocks.getQuote(new String[]{symbol + ".JK"});
                                 if (dataaset != null) {
                                     int b = Dbs.insertPorto(userid,symbol+".JK");
@@ -196,7 +247,7 @@ public class Controller {
                                         replyFallback(event.getReplyToken(),14);
                                     }
                                 }else{
-                                    replyText(event.getReplyToken(), symbol + " tidak ditemukan.");
+                                    replyText(event.getReplyToken(), "Saham " +symbol + " tidak ditemukan.");
                                 }
                             }else{
                                 replyFallback(event.getReplyToken(),3);
@@ -211,7 +262,7 @@ public class Controller {
                                 }else if(b==-1){
                                     replyFallback(event.getReplyToken(),12); //porto kosong
                                 }else if(b==-2){
-                                    replyText(event.getReplyToken(), symbol + " tidak ditemukan."); //simbol tidak ditemukan
+                                    replyText(event.getReplyToken(), symbol + " tidak ditemukan di portofolio kamu."); //simbol tidak ditemukan
                                 }else{
                                     replyFallback(event.getReplyToken(),14);
                                 }
@@ -221,7 +272,7 @@ public class Controller {
                             return;
                         case "saham":
                             symbol = msg.toUpperCase().substring(6); //misal teks "saham BBCA", berarti memisahkan teks "saham " dengan "BBCA"
-                            ArrayList<ArrayList<String>> dataaset=Stocks.getQuote(new String[]{symbol + ".JK"});
+                            ArrayList<ArrayList<String>> dataaset = isIndex(symbol.toLowerCase()).equals("NA") ? Stocks.getQuote(new String[]{symbol + ".JK"}) : null;
                             if (dataaset != null) {
                                 ArrayList<String> dataset = new ArrayList<>();
                                 dataset.add(symbol);
@@ -239,24 +290,16 @@ public class Controller {
                                 dataset.add(symbol);
                                 replyFlexMessage(event.getReplyToken(), 2, dataset);
                             } else {
-                                replyText(event.getReplyToken(), symbol + " tidak ditemukan.");
+                                replyText(event.getReplyToken(), "Saham " +symbol + " tidak ditemukan.");
                             }
                             return;
                         case "indeks":
                             symbol = msg.toLowerCase().substring(7);
                         case "index":
-                            try {
                                 if (symbol.equals("")) {
                                     symbol = msg.toLowerCase().substring(6);
                                 }
-                                ClassLoader classLoader = getClass().getClassLoader();
-                                String idx_keys = IOUtils.toString(classLoader.getResourceAsStream("index_keywords.json"));
-                                String idkey = "NA";
-                                JSONObject idxkeys = new JSONObject(idx_keys);
-                                try {
-                                    idkey = idxkeys.getString(symbol);
-                                } catch (Exception ignored) {
-                                }
+                                String idkey = isIndex(symbol);
                                 if (!idkey.equals("NA")) {
                                     ArrayList<ArrayList<String>> dset=Stocks.getQuote(new String[]{idkey});
                                     ArrayList<String> dataset = new ArrayList<>();
@@ -275,10 +318,8 @@ public class Controller {
                                     dataset.add(symbol);
                                     replyFlexMessage(event.getReplyToken(), 2, dataset);
                                 } else {
-                                    replyText(event.getReplyToken(), symbol.toUpperCase() + " tidak ditemukan.");
+                                    replyText(event.getReplyToken(), "Index " +symbol.toUpperCase() + " tidak ditemukan.");
                                 }
-                            } catch (Exception ignored) {
-                            }
                             return;
                         case "profile":
                                 if(Dbs.isUserExist(userid)){
@@ -411,11 +452,39 @@ public class Controller {
             replyFallback(event.getReplyToken(),1);
         }
     }
+    private String isIndex(String simbol){
+        return isIndex(simbol,1);
+    }
+    private String isIndex(String simbol,int tipe){ //1: cek keyword 2: cek value
+        String idkey="NA";
+        try {
+            ClassLoader classLoader = getClass().getClassLoader();
+            String idx_keys;
+            if(tipe==1) {
+                idx_keys = IOUtils.toString(classLoader.getResourceAsStream("index_keywords.json"));
+            }else{
+                idx_keys = IOUtils.toString(classLoader.getResourceAsStream("index_keyreversed.json"));
+            }
+            JSONObject idxkeys = new JSONObject(idx_keys);
+            try {
+                 idkey = idxkeys.getString(simbol);
+            } catch (Exception ignored) {
+            }
+        }catch(Exception ignored){
+        }
+        return idkey;
+    }
     private void replyPortoFlex(String replyToken, String uid){
-        List<PortoWatchlist> porto = Dbs.getUserPorto(uid);
+        replyPWFlex(replyToken,uid,1);
+    }
+    private void replyWlistFlex(String replyToken, String uid){
+        replyPWFlex(replyToken,uid,2);
+    }
+    private void replyPWFlex(String replyToken, String uid, int PW){ //1:porto 2:watchlist
+        List<PortoWatchlist> porto = (PW == 1 ? Dbs.getUserPorto(uid) : Dbs.getUserWlist(uid));
         StocksAPI Stocks = new StocksAPI();
         if(porto.size()==0){
-            replyFallback(replyToken,12);
+            replyFallback(replyToken,PW==1 ? 12 : 13) ;
             return;
         }
         String[] simbols=new String[porto.size()];
@@ -431,8 +500,19 @@ public class Controller {
             double changep=0;
             int dtsize=dataaset.size();
             for(int i = 0; i<dtsize;i++){
-                String portox;
-                portox=portowlist.replaceAll("SimbolX",simbols[i].replaceAll(".JK",""));
+                String portox=portowlist;
+                if(PW==1) {
+                    portox = portox.replaceAll("SimbolX", simbols[i].replaceAll(".JK", ""));
+                }else{
+                    String simidx=isIndex(simbols[i],2);
+                    if(!simidx.equals("NA")){
+                        portox=portox.replaceAll("saham SimbolX","index SimbolX");
+                        portox=portox.replaceAll("-portofolio SimbolX","-watchlist SimbolX");
+                        portox=portox.replaceAll("SimbolX",simidx);
+                    }else{
+                        portox = portox.replaceAll("SimbolX", simbols[i].replaceAll(".JK", ""));
+                    }
+                }
                 double changex=Double.parseDouble(dataaset.get(i).get(4));
                 changep=changep+changex;
                 String changepx = String.format(changex > 0 ? "+%.2f%%" : "%.2f%%", changex);
@@ -443,8 +523,24 @@ public class Controller {
                 } else if (changex<0) {
                     color="#C62828"; //merah
                 }
+                String shortName = dataaset.get(i).get(0);
+                if(shortName.equals("N/A")){
+                    String sim = dataaset.get(i).get(5);
+                    if(sim.contains("^JK")){
+                        shortName=sim.replaceAll("\\^JK","");
+                    }else if(sim.contains(".JK")){
+                        shortName=sim.replaceAll(".JK","");
+                    }else{
+                        shortName=sim;
+                    }
+                }
+                portox=portox.replaceAll("shortNameX",shortName);
                 portox=portox.replaceAll("ColorCX",color);
-                bubble=bubble.replaceAll("SeparatorSimbol",portox);
+                if(i==10){
+                    String bub = bubble;
+                    bubble = bubble.replaceAll("SeparatorCarousel",bub);
+                }
+                bubble = bubble.replaceAll("SeparatorSimbol", portox);
             }
             bubble=bubble.replaceAll("Text1","Portofolioku");
             changep=changep/dtsize;
@@ -556,6 +652,9 @@ public class Controller {
             case 18: //simbol porto sudah ada
                 replyText(replyToken,"Kode yang kamu daftarkan sudah ada ya di watchlist kamu.");
                 break;
+            case 19: //tidak bisa menambahkan indeks ke porto
+                replyText(replyToken,"Index tidak bisa ditambahkan ke portofolio ya:)");
+                break;
         }
     }
     private void replyFlexMessage(String replyToken, int flextype, ArrayList<String> flexText) {
@@ -580,7 +679,11 @@ public class Controller {
             }else if(flextype==2){
                 flexTemplate = IOUtils.toString(classLoader.getResourceAsStream("flex_stock.json"));
                 for(int i=1; i<=flexText.size();i++){
-                    flexTemplate=flexTemplate.replaceAll("Text"+i,flexText.get(i-1));
+                    if(i==7 && !isIndex(flexText.get(i-1)).equals("NA")){
+                        flexTemplate=flexTemplate.replaceAll(tblPorto,"");
+                    }else {
+                        flexTemplate = flexTemplate.replaceAll("Text" + i, flexText.get(i - 1));
+                    }
                 }
                 flexContainer = objectMapper.readValue(flexTemplate, FlexContainer.class);
                 replyMessage = new ReplyMessage(replyToken, new FlexMessage("Performa " + flexText.get(0) + " hari ini", flexContainer));

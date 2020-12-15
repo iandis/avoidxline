@@ -106,16 +106,7 @@
         },
         "color": "#2196F3"
       },
-      {
-        "type": "button",
-        "height": "md",
-        "action": {
-          "type": "message",
-          "label": "Tambah ke Portofolio",
-          "text": "+portofolio Text7"
-        },
-        "color": "#2196F3"
-      },
+      {"type":"button","height":"md","action":{"type":"message","label":"Tambah ke Portofolio","text":"+portofolio Text7"},"color":"#2196F3"},
       {
         "type": "button",
         "height": "md",
