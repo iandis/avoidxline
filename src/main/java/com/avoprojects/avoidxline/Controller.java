@@ -463,9 +463,8 @@ public class Controller {
             JSONObject yfjson = new JSONObject(idx);
             Iterator<String> it = yfjson.keys();
             String[]twlist = new String[36];
-            int j=0;
-            while (it.hasNext()) {
-                twlist[j] = it.next();j++;
+            for (int j=0; j<36;j++) {
+                twlist[j] = it.next();
             }
             StocksAPI Stocks = new StocksAPI();
             ArrayList<ArrayList<String>> dataaset = Stocks.getQuote(twlist);
@@ -488,15 +487,15 @@ public class Controller {
                 if (shortName.equals("N/A")) {
                     String simx = dataaset.get(i).get(5);
                     if (simx.contains("^JK")) {
-                        shortName = simx.substring(simx.indexOf("^JK") + "^JK".length());
+                        shortName = simx.substring(simx.indexOf("^JK") + "^JK".length()) + " Index";
                     } else if (simx.contains(".JK")) {
-                        shortName = simx.replaceAll(".JK", "");
+                        shortName = simx.replaceAll(".JK", "") + " Index";
                     } else {
-                        shortName = simx;
+                        shortName = "Indeks " + simx;
                     }
                 }
                 ftw = ftw.replaceAll("shortNameX", shortName);
-                if((i+1) % 6 == 0 && (i+1)!=36){
+                if((i+1) % 9 == 0 && (i+1)!=36){
                     String bub = twlistbubble;
                     twlistbubble = twlistbubble.replaceAll("SeparatorSimbol","");
                     twlistbubble = twlistbubble.replaceAll("SeparatorCarousel",bub);
@@ -511,9 +510,9 @@ public class Controller {
             FlexContainer flexContainer = objectMapper.readValue(flexTemplate, FlexContainer.class);
             ReplyMessage replyMessage = new ReplyMessage(replyToken,new FlexMessage("Daftar Kode Indeks",flexContainer));
             reply(replyMessage);
-        }catch(Exception e){
-            ReplyMessage replyMessage = new ReplyMessage(replyToken,new TextMessage(e.toString()));
-            reply(replyMessage);
+        }catch(Exception ignored){
+//            ReplyMessage replyMessage = new ReplyMessage(replyToken,new TextMessage(e.toString()));
+//            reply(replyMessage);
         }
     }
     private String isIndex(String simbol){
@@ -620,7 +619,7 @@ public class Controller {
             bubble=bubble.replaceAll("Text1",PW==1 ? "Portofolioku":"Watchlistku");
             changep=changep/dtsize;
             String changepx = String.format(changep > 0 ? "+%.2f%%" : "%.2f%%", changep);
-            bubble=bubble.replaceAll("LabaRugiX",PW==1 ? changepx : "--");
+            bubble=bubble.replaceAll("LabaRugiX",PW==1 ? changepx : " ");
             String color="#000000";
             if (changep>0) {
                 color="#2E7D32";
@@ -633,7 +632,6 @@ public class Controller {
             carousel=carousel.replaceAll("SeparatorCarousel",bubble);
             if(PW==2){
                 carousel=carousel.replaceAll("Laba/Rugi:", "Kode");
-                carousel=carousel.replaceAll("LabaRugiX", "Perubahan");
             }
             ObjectMapper objectMapper = ModelObjectMapper.createNewObjectMapper();
             FlexContainer flexContainer = objectMapper.readValue(carousel, FlexContainer.class);
