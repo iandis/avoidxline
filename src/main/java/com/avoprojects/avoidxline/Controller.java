@@ -471,9 +471,11 @@ public class Controller {
             List<Message> msg = new ArrayList<>();
             for(int k = 0; k<=1; k++) {
                 String flextwlist = IOUtils.toString(classLoader.getResourceAsStream("flex_topwlist.json"));
-                String twlistbubble = IOUtils.toString(classLoader.getResourceAsStream("flex_topwlist_bubble.json"));
+                String twlistbubblex = IOUtils.toString(classLoader.getResourceAsStream("flex_topwlist_bubble.json"));
+                String twlistbubble=twlistbubblex;
                 for (int i = (k * 18); i < 18 * (k + 1); i++) {
                     String ftw = flextwlist;
+                    ftw = ftw.replaceAll("saham SimbolX", "index SimbolX");
                     ftw = ftw.replaceAll("SimbolX", yfjson.getString(twlist[i]).toUpperCase());
                     double changex = Double.parseDouble(dataaset.get(i).get(4));
                     String changepx = String.format(changex > 0 ? "+%.2f%%" : "%.2f%%", changex);
@@ -498,9 +500,8 @@ public class Controller {
                     }
                     ftw = ftw.replaceAll("shortNameX", shortName);
                     if (((i + 1) % 6 == 0) && ((i + 1) != 18 * (k + 1))) {
-                        String bub = twlistbubble;
                         twlistbubble = twlistbubble.replaceAll("SeparatorSimbol", "");
-                        twlistbubble = twlistbubble.replaceAll("SeparatorCarousel", bub);
+                        twlistbubble = twlistbubble.replaceAll("SeparatorCarousel", twlistbubblex);
                     }
                     twlistbubble = twlistbubble.replaceAll("SeparatorSimbol", ftw);
                 }
@@ -571,7 +572,8 @@ public class Controller {
         try {
             ClassLoader classLoader = getClass().getClassLoader();
             String carousel = IOUtils.toString(classLoader.getResourceAsStream("carousel_flex_template.json"));
-            String bubble = IOUtils.toString(classLoader.getResourceAsStream("bubble_flex_template.json"));
+            String bubblex = IOUtils.toString(classLoader.getResourceAsStream("bubble_flex_template.json"));
+            String bubble = bubblex;
             String portowlist = IOUtils.toString(classLoader.getResourceAsStream("portowlist_fraction.json"));
             ArrayList<ArrayList<String>> dataaset = Stocks.getQuote(simbols);
             double changep=0;
@@ -614,9 +616,8 @@ public class Controller {
                 portox=portox.replaceAll("shortNameX",shortName);
                 portox=portox.replaceAll("ColorCX",color);
                 if(i==10){
-                    String bub = bubble;
                     bubble = bubble.replaceAll("SeparatorSimbol","");
-                    bubble = bubble.replaceAll("SeparatorCarousel",bub);
+                    bubble = bubble.replaceAll("SeparatorCarousel",bubblex);
                 }
                 bubble = bubble.replaceAll("SeparatorSimbol", portox);
             }
@@ -760,6 +761,9 @@ public class Controller {
                 for (int i = 0; i < Math.min(dtsize, 5); i++) {
                     String ftw = flextwlist;
                     String sim = isIndex(simbols[i], 2);
+                    if(!sim.equals("NA")) {
+                        ftw = ftw.replaceAll("saham SimbolX", "index SimbolX");
+                    }
                     ftw = ftw.replaceAll("SimbolX", sim.equals("NA") ? simbols[i].replaceAll(".JK", "") : sim.toUpperCase());
                     double changex = Double.parseDouble(dataaset.get(i).get(4));
                     String changepx = String.format(changex > 0 ? "+%.2f%%" : "%.2f%%", changex);
