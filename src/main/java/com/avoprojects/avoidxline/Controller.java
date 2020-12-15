@@ -359,7 +359,7 @@ public class Controller {
                                             return;
                                         }
                                         Dbs.createUser(userid, nama, bio);
-                                        replyText(event.getReplyToken(), "Yeay! Pendaftaran kamu sukses!");
+                                        replyUserProfile(event.getReplyToken(),userid,"Yeay! Pendaftaran kamu sukses!");
                                     } else {
                                         replyFallback(event.getReplyToken(), 4);
                                     }
