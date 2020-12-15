@@ -459,7 +459,8 @@ public class Controller {
         try {
             ClassLoader classLoader = getClass().getClassLoader();
             String flexTemplate=IOUtils.toString(classLoader.getResourceAsStream("carousel_flex_template.json"));
-            JSONObject yfjson = new JSONObject(flexTemplate);
+            String idx=IOUtils.toString(classLoader.getResourceAsStream("index_keyreversed.json"));
+            JSONObject yfjson = new JSONObject(idx);
             Iterator<String> it = yfjson.keys();
             String[]twlist = new String[36];
             int j=0;
