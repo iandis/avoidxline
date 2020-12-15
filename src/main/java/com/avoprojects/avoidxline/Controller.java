@@ -468,47 +468,51 @@ public class Controller {
             }
             StocksAPI Stocks = new StocksAPI();
             ArrayList<ArrayList<String>> dataaset = Stocks.getQuote(twlist);
-            String flextwlist = IOUtils.toString(classLoader.getResourceAsStream("flex_topwlist.json"));
-            String twlistbubble = IOUtils.toString(classLoader.getResourceAsStream("flex_topwlist_bubble.json"));
-            for (int i = 0; i < 36; i++) {
-                String ftw = flextwlist;
-                ftw = ftw.replaceAll("SimbolX", yfjson.getString(twlist[i]).toUpperCase());
-                double changex = Double.parseDouble(dataaset.get(i).get(4));
-                String changepx = String.format(changex > 0 ? "+%.2f%%" : "%.2f%%", changex);
-                ftw = ftw.replaceAll("ChangeX", changepx);
-                String color = "#000000";
-                if (changex > 0) {
-                    color = "#2E7D32"; //hijau
-                } else if (changex < 0) {
-                    color = "#C62828"; //merah
-                }
-                ftw = ftw.replaceAll("ColorCX", color);
-                String shortName = dataaset.get(i).get(0);
-                if (shortName.equals("N/A")) {
-                    String simx = dataaset.get(i).get(5);
-                    if (simx.contains("^JK")) {
-                        shortName = simx.substring(simx.indexOf("^JK") + "^JK".length()) + " Index";
-                    } else if (simx.contains(".JK")) {
-                        shortName = simx.replaceAll(".JK", "") + " Index";
-                    } else {
-                        shortName = "Indeks " + simx;
+            List<Message> msg = new ArrayList<>();
+            for(int k = 0; k<=1; k++) {
+                String flextwlist = IOUtils.toString(classLoader.getResourceAsStream("flex_topwlist.json"));
+                String twlistbubble = IOUtils.toString(classLoader.getResourceAsStream("flex_topwlist_bubble.json"));
+                for (int i = (k * 18); i < 18 * (k + 1); i++) {
+                    String ftw = flextwlist;
+                    ftw = ftw.replaceAll("SimbolX", yfjson.getString(twlist[i]).toUpperCase());
+                    double changex = Double.parseDouble(dataaset.get(i).get(4));
+                    String changepx = String.format(changex > 0 ? "+%.2f%%" : "%.2f%%", changex);
+                    ftw = ftw.replaceAll("ChangeX", changepx);
+                    String color = "#000000";
+                    if (changex > 0) {
+                        color = "#2E7D32"; //hijau
+                    } else if (changex < 0) {
+                        color = "#C62828"; //merah
                     }
+                    ftw = ftw.replaceAll("ColorCX", color);
+                    String shortName = dataaset.get(i).get(0);
+                    if (shortName.equals("N/A")) {
+                        String simx = dataaset.get(i).get(5);
+                        if (simx.contains("^JK")) {
+                            shortName = simx.substring(simx.indexOf("^JK") + "^JK".length()) + " Index";
+                        } else if (simx.contains(".JK")) {
+                            shortName = simx.replaceAll(".JK", "") + " Index";
+                        } else {
+                            shortName = "Indeks " + simx;
+                        }
+                    }
+                    ftw = ftw.replaceAll("shortNameX", shortName);
+                    if ((i + 1) % 6 == 0 && (i + 1) != 36) {
+                        String bub = twlistbubble;
+                        twlistbubble = twlistbubble.replaceAll("SeparatorSimbol", "");
+                        twlistbubble = twlistbubble.replaceAll("SeparatorCarousel", bub);
+                    }
+                    twlistbubble = twlistbubble.replaceAll("SeparatorSimbol", ftw);
                 }
-                ftw = ftw.replaceAll("shortNameX", shortName);
-                if((i+1) % 9 == 0 && (i+1)!=36){
-                    String bub = twlistbubble;
-                    twlistbubble = twlistbubble.replaceAll("SeparatorSimbol","");
-                    twlistbubble = twlistbubble.replaceAll("SeparatorCarousel",bub);
-                }
-                twlistbubble = twlistbubble.replaceAll("SeparatorSimbol", ftw);
+                twlistbubble = twlistbubble.replaceAll("SeparatorSimbol", "");
+                twlistbubble = twlistbubble.replaceAll(",SeparatorCarousel", "");
+                twlistbubble = twlistbubble.replaceAll("Top Watchlist", "Daftar Kode Indeks");
+                flexTemplate = flexTemplate.replaceAll("SeparatorCarousel", twlistbubble);
+                ObjectMapper objectMapper = ModelObjectMapper.createNewObjectMapper();
+                FlexContainer flexContainer = objectMapper.readValue(flexTemplate, FlexContainer.class);
+                msg.add(new FlexMessage("Daftar Kode Indeks", flexContainer));
             }
-            twlistbubble = twlistbubble.replaceAll("SeparatorSimbol", "");
-            twlistbubble = twlistbubble.replaceAll(",SeparatorCarousel", "");
-            twlistbubble = twlistbubble.replaceAll("Top Watchlist","Daftar Kode Indeks");
-            flexTemplate = flexTemplate.replaceAll("SeparatorCarousel", twlistbubble);
-            ObjectMapper objectMapper = ModelObjectMapper.createNewObjectMapper();
-            FlexContainer flexContainer = objectMapper.readValue(flexTemplate, FlexContainer.class);
-            ReplyMessage replyMessage = new ReplyMessage(replyToken,new FlexMessage("Daftar Kode Indeks",flexContainer));
+            ReplyMessage replyMessage = new ReplyMessage(replyToken,msg);
             reply(replyMessage);
         }catch(Exception ignored){
 //            ReplyMessage replyMessage = new ReplyMessage(replyToken,new TextMessage(e.toString()));
