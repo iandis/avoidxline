@@ -469,11 +469,11 @@ public class Controller {
             StocksAPI Stocks = new StocksAPI();
             ArrayList<ArrayList<String>> dataaset = Stocks.getQuote(twlist);
             List<Message> msg = new ArrayList<>();
-            for(int k = 0; k<=1; k++) {
+            //for(int k = 0; k<=1; k++) {
                 String flextwlist = IOUtils.toString(classLoader.getResourceAsStream("flex_topwlist.json"));
                 String twlistbubblex = IOUtils.toString(classLoader.getResourceAsStream("flex_topwlist_bubble.json"));
                 String twlistbubble=twlistbubblex;
-                for (int i = (k * 18); i < 18 * (k + 1); i++) {
+                for (int i = 0; i < 36; i++) {
                     String ftw = flextwlist;
                     ftw = ftw.replaceAll("saham SimbolX", "index SimbolX");
                     ftw = ftw.replaceAll("SimbolX", yfjson.getString(twlist[i]).toUpperCase());
@@ -499,7 +499,7 @@ public class Controller {
                         }
                     }
                     ftw = ftw.replaceAll("shortNameX", shortName);
-                    if (((i + 1) % 6 == 0) && ((i + 1) != 18 * (k + 1))) {
+                    if (i % 9 == 0) {
                         twlistbubble = twlistbubble.replaceAll("SeparatorSimbol", "");
                         twlistbubble = twlistbubble.replaceAll("SeparatorCarousel", twlistbubblex);
                     }
@@ -512,7 +512,7 @@ public class Controller {
                 ObjectMapper objectMapper = ModelObjectMapper.createNewObjectMapper();
                 FlexContainer flexContainer = objectMapper.readValue(flexTemplate, FlexContainer.class);
                 msg.add(new FlexMessage("Daftar Kode Indeks", flexContainer));
-            }
+            //}
             ReplyMessage replyMessage = new ReplyMessage(replyToken,msg);
             reply(replyMessage);
         }catch(Exception ignored){
