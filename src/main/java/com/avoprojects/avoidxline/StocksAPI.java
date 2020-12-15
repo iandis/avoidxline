@@ -55,9 +55,12 @@ public class StocksAPI {
                     try {
                         double mMarketcap = yfresult.getJSONObject(i).getDouble("marketCap");
                         marketCap = formatMarketCap(mMarketcap);
-                        shortName = yfresult.getJSONObject(i).getString("shortName");
                     } catch (Exception e) {
                         marketCap = "N/A";
+                    }
+                    try{
+                        shortName = yfresult.getJSONObject(i).getString("shortName");
+                    } catch (Exception e) {
                         shortName = "N/A";
                     }
                     price = String.format("%.2f", mPrice);

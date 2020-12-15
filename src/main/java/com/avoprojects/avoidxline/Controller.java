@@ -497,7 +497,7 @@ public class Controller {
                         }
                     }
                     ftw = ftw.replaceAll("shortNameX", shortName);
-                    if ((i + 1) % 6 == 0 && (i + 1) != 36) {
+                    if (((i + 1) % 6 == 0) && ((i + 1) != 18 * (k + 1))) {
                         String bub = twlistbubble;
                         twlistbubble = twlistbubble.replaceAll("SeparatorSimbol", "");
                         twlistbubble = twlistbubble.replaceAll("SeparatorCarousel", bub);
