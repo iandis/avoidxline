@@ -495,7 +495,7 @@ public class Controller {
                     }
                 }
                 ftw = ftw.replaceAll("shortNameX", shortName);
-                if((i+1) % 6 == 0 && i!=35){
+                if((i+1) % 6 == 0 && (i+1)!=36){
                     String bub = twlistbubble;
                     twlistbubble = twlistbubble.replaceAll("SeparatorSimbol","");
                     twlistbubble = twlistbubble.replaceAll("SeparatorCarousel",bub);
@@ -510,7 +510,10 @@ public class Controller {
             FlexContainer flexContainer = objectMapper.readValue(flexTemplate, FlexContainer.class);
             ReplyMessage replyMessage = new ReplyMessage(replyToken,new FlexMessage("Daftar Kode Indeks",flexContainer));
             reply(replyMessage);
-        }catch(Exception ignored){}
+        }catch(Exception e){
+            ReplyMessage replyMessage = new ReplyMessage(replyToken,new TextMessage(e.toString()));
+            reply(replyMessage);
+        }
     }
     private String isIndex(String simbol){
         return isIndex(simbol,1);
