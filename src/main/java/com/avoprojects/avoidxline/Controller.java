@@ -591,13 +591,14 @@ public class Controller {
                     portox = portox.replaceAll("SimbolX", simbols[i].replaceAll(".JK", ""));
                 }else{
                     String simidx=isIndex(simbols[i],2);
+                    portox=portox.replaceAll("-portofolio SimbolX","-watchlist SimbolX");
                     if(!simidx.equals("NA")){
                         portox=portox.replaceAll("saham SimbolX","index SimbolX");
-                        portox=portox.replaceAll("-portofolio SimbolX","-watchlist SimbolX");
                         portox=portox.replaceAll("SimbolX",simidx.toUpperCase());
                     }else{
                         portox = portox.replaceAll("SimbolX", simbols[i].replaceAll(".JK", ""));
                     }
+
                 }
                 double changex=Double.parseDouble(dataaset.get(i).get(4));
                 changep=changep+changex;
