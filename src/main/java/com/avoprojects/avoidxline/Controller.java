@@ -326,12 +326,7 @@ public class Controller {
                             return;
                         case "profile":
                                 if(Dbs.isUserExist(userid)){
-                                    User usr = Dbs.getUserProfile(userid);
-                                    ArrayList<String> user = new ArrayList<>();
-                                    user.add(usr.uname);
-                                    user.add(usr.ustatus);
-                                    user.add(getProfile(userid).getPictureUrl());
-                                    replyFlexMessage(event.getReplyToken(), 3, user);
+                                    replyUserProfile(event.getReplyToken(),userid);
                                 }else{
                                     replyFallback(event.getReplyToken(),3);
                                 }
@@ -455,6 +450,18 @@ public class Controller {
             replyFallback(event.getReplyToken(),1);
         }
     }
+    private void replyUserProfile(String replyToken, String userid){
+        replyUserProfile(replyToken,userid,"default");
+    }
+    private void replyUserProfile(String replyToken, String userid, String msg){
+        User usr = Dbs.getUserProfile(userid);
+        ArrayList<String> user = new ArrayList<>();
+        user.add(usr.uname);
+        user.add(usr.ustatus);
+        user.add(getProfile(userid).getPictureUrl());
+        user.add(msg);
+        replyFlexMessage(replyToken, 3, user);
+    }
     private void replyFlexIndices(String replyToken){
         try {
             ClassLoader classLoader = getClass().getClassLoader();
@@ -499,7 +506,7 @@ public class Controller {
                         }
                     }
                     ftw = ftw.replaceAll("shortNameX", shortName);
-                    if (i % 9 == 0) {
+                    if (i % 9 == 0 && i!=0) {
                         twlistbubble = twlistbubble.replaceAll("SeparatorSimbol", "");
                         twlistbubble = twlistbubble.replaceAll("SeparatorCarousel", twlistbubblex);
                     }
@@ -561,7 +568,7 @@ public class Controller {
             if(additionalMsg.equals("default")){
                 replyFallback(replyToken,PW==1 ? 12 : 13);
             }else{
-                replyText(replyToken,additionalMsg);
+                replyUserProfile(replyToken,uid,additionalMsg);//replyText(replyToken,additionalMsg);
             }
             return;
         }
@@ -799,7 +806,7 @@ public class Controller {
     }
     private void replyFlexMessage(String replyToken, int flextype, ArrayList<String> flexText) {
         try {
-            //1: Menu awal, 2: Stock, 3: Profile, 4: Portofolio, 5: Watchlist
+            //1: Menu awal, 2: Stock, 3: Profile
             ClassLoader classLoader = getClass().getClassLoader();
             String flexTemplate; FlexContainer flexContainer; ReplyMessage replyMessage=null;
             ObjectMapper objectMapper = ModelObjectMapper.createNewObjectMapper();
@@ -812,10 +819,9 @@ public class Controller {
                     msgArray.add(new TextMessage(flexText.get(0)));
                 }
                 msgArray.add(new FlexMessage("Menu", flexContainer));
-                msgArray.add(new TextMessage("Tips:\nKamu bisa cari kode saham yang mau kamu cek dengan memilih \"Intip Daftar Saham\". Setelah dapat, kamu bisa cek performa nya dengan keyword:"));
+                msgArray.add(new TextMessage("Tips:\nKamu bisa cari kode saham yang mau kamu cek dengan memilih \"Intip Daftar Saham\". Setelah dapat, kamu bisa cek detail nya dengan keyword:"));
                 msgArray.add(new TextMessage("saham kodesaham"));
-                msgArray.add(new TextMessage("Kamu juga bisa intip beberapa indeks dengan memilih \"Daftar Kode Indeks\". Setelah itu, kamu bisa cek performa nya dengan keyword:"));
-                msgArray.add(new TextMessage("index kodeindex"));
+                msgArray.add(new TextMessage("Kamu juga bisa intip beberapa indeks dengan memilih \"Daftar Kode Indeks\". Setelah itu, kamu bisa cek detail nya dengan memilih kode nya ya."));
                 replyMessage = new ReplyMessage(replyToken, msgArray);
             }else if(flextype==2){
                 flexTemplate = IOUtils.toString(classLoader.getResourceAsStream("flex_stock.json"));
@@ -833,11 +839,16 @@ public class Controller {
                 replyMessage = new ReplyMessage(replyToken, new FlexMessage("Performa " + flexText.get(0) + " hari ini", flexContainer));
             }else if(flextype==3){
                 flexTemplate = IOUtils.toString(classLoader.getResourceAsStream("flex_profile.json"));
-                for(int i=1; i<=flexText.size();i++){
+                for(int i=1; i<=3;i++){
                     flexTemplate=flexTemplate.replaceAll("Text"+i,flexText.get(i-1));
                 }
                 flexContainer = objectMapper.readValue(flexTemplate, FlexContainer.class);
-                replyMessage = new ReplyMessage(replyToken, new FlexMessage("Profileku", flexContainer));
+                List<Message> msg = new ArrayList<>();
+                msg.add(new FlexMessage("Profileku", flexContainer));
+                if(!flexText.get(3).equals("default")){msg.add(new TextMessage(flexText.get(3)));}
+                replyMessage = new ReplyMessage(replyToken, msg);
+                reply(replyMessage);
+                return;
             }
             reply(replyMessage);
         } catch (IOException e) {
