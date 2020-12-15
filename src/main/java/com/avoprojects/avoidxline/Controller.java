@@ -679,10 +679,10 @@ public class Controller {
             }else if(flextype==2){
                 flexTemplate = IOUtils.toString(classLoader.getResourceAsStream("flex_stock.json"));
                 for(int i=1; i<=flexText.size();i++){
-                    if(i==7 && !isIndex(flexText.get(i-1)).equals("NA")){
+                    if(i==7 && !isIndex(flexText.get(0).toLowerCase()).equals("NA")){
                         flexTemplate=flexTemplate.replaceAll(tblPorto,"");
                     }else {
-                        flexTemplate = flexTemplate.replaceAll("Text" + i, flexText.get(i - 1));
+                        flexTemplate = flexTemplate.replaceAll("Text" + i, i==2 ? (flexText.get(1).equals("N/A") ? flexText.get(0) + " Index" : flexText.get(1)) : flexText.get(i-1));
                     }
                 }
                 flexContainer = objectMapper.readValue(flexTemplate, FlexContainer.class);
