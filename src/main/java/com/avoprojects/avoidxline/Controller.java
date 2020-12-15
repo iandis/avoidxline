@@ -495,7 +495,7 @@ public class Controller {
                     }
                 }
                 ftw = ftw.replaceAll("shortNameX", shortName);
-                if((i+1) % 6 == 0){
+                if((i+1) % 6 == 0 && i!=35){
                     String bub = twlistbubble;
                     twlistbubble = twlistbubble.replaceAll("SeparatorSimbol","");
                     twlistbubble = twlistbubble.replaceAll("SeparatorCarousel",bub);
@@ -508,7 +508,7 @@ public class Controller {
             flexTemplate = flexTemplate.replaceAll("SeparatorCarousel", twlistbubble);
             ObjectMapper objectMapper = ModelObjectMapper.createNewObjectMapper();
             FlexContainer flexContainer = objectMapper.readValue(flexTemplate, FlexContainer.class);
-            ReplyMessage replyMessage= new ReplyMessage(replyToken,new FlexMessage("Daftar Kode Indeks",flexContainer));
+            ReplyMessage replyMessage = new ReplyMessage(replyToken,new FlexMessage("Daftar Kode Indeks",flexContainer));
             reply(replyMessage);
         }catch(Exception ignored){}
     }
@@ -550,7 +550,11 @@ public class Controller {
         List<PortoWatchlist> porto = (PW == 1 ? Dbs.getUserPorto(uid) : Dbs.getUserWlist(uid));
         StocksAPI Stocks = new StocksAPI();
         if(porto.size()==0){
-            if(additionalMsg.equals("default")){replyFallback(replyToken,PW==1 ? 12 : 13);}
+            if(additionalMsg.equals("default")){
+                replyFallback(replyToken,PW==1 ? 12 : 13);
+            }else{
+                replyText(replyToken,additionalMsg);
+            }
             return;
         }
         String[] simbols=new String[porto.size()];
