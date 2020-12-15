@@ -32,7 +32,7 @@
           "weight": "bold",
           "action": {
             "type": "message",
-            "text": "+watchlist SimbolX"
+            "text": "adwatchlist SimbolX"
           },
           "text": "➕"
         }

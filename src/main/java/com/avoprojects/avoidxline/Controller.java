@@ -40,10 +40,10 @@ public class Controller {
             "indeks","index",
             "profile","edit profile",
             "+nama","+bio",
-            "+daftar","daftar","-leave", "menu",
-            "+portofolio","+watchlist",
+            "+daftar","daftar","botleave", "menu",
+            "adportofolio","adwatchlist",
             "portofolio","watchlist",
-            "-portofolio","-watchlist",
+            "rmportofolio","rmwatchlist",
             "intipindex","intipindeks"};
     //private String plus="➕";
     @Autowired
@@ -184,9 +184,9 @@ public class Controller {
                         case "watchlist":
                             replyWlistFlex(event.getReplyToken(),userid);
                             return;
-                        case "+watchlist":
+                        case "adwatchlist":
                             if(Dbs.isUserExist(userid)){
-                                symbol = msg.toUpperCase().substring("+watchlist ".length());
+                                symbol = msg.toUpperCase().substring("adwatchlist ".length());
                                 String isidx = isIndex(symbol.toLowerCase());
                                 String sim=isidx.equals("NA") ? symbol + ".JK" : isidx;
                                 ArrayList<ArrayList<String>> dataaset=Stocks.getQuote(new String[]{sim});
@@ -208,9 +208,9 @@ public class Controller {
                                 replyFallback(event.getReplyToken(),3);
                             }
                             return;
-                        case "-watchlist":
+                        case "rmwatchlist":
                             if(Dbs.isUserExist(userid)){
-                                symbol = msg.toUpperCase().substring("-watchlist ".length());
+                                symbol = msg.toUpperCase().substring("rmwatchlist ".length());
                                 String isidx = isIndex(symbol.toLowerCase());
                                 String sim=isidx.equals("NA") ? symbol + ".JK" : isidx;
                                 int b = Dbs.deleteWlist(userid,sim);
@@ -230,9 +230,9 @@ public class Controller {
                         case "portofolio":
                             replyPortoFlex(event.getReplyToken(),userid);
                             return;
-                        case "+portofolio":
+                        case "adportofolio":
                             if(Dbs.isUserExist(userid)){
-                                symbol = msg.toUpperCase().substring("+portofolio ".length());
+                                symbol = msg.toUpperCase().substring("adportofolio ".length());
                                 if(!isIndex(symbol).equals("NA")){
                                     replyFallback(event.getReplyToken(),19); //indeks tidak bsa di porto
                                     return;
@@ -256,9 +256,9 @@ public class Controller {
                                 replyFallback(event.getReplyToken(),3);
                             }
                             return;
-                        case "-portofolio":
+                        case "rmportofolio":
                             if(Dbs.isUserExist(userid)){
-                                symbol = msg.toUpperCase().substring("-portofolio ".length());
+                                symbol = msg.toUpperCase().substring("rmportofolio ".length());
                                 int b = Dbs.deletePorto(userid,symbol+".JK");
                                 if (b>0) {
                                     replyPortoFlex(event.getReplyToken(),userid,symbol + " berhasil dihapus dari portofolio kamu.");
@@ -429,7 +429,7 @@ public class Controller {
                             } else {
                                 replyFallback(event.getReplyToken(),2);
                             }
-                        case "-leave":
+                        case "botleave":
                             if (event.getSource() instanceof GroupSource) {
                                 replyText(event.getReplyToken(), "Yah:( Yaudah deh kalo gitu Avo pamit dulu ya.");
                                 leaveGroup(event.getSource().getSenderId());
@@ -591,7 +591,7 @@ public class Controller {
                     portox = portox.replaceAll("SimbolX", simbols[i].replaceAll(".JK", ""));
                 }else{
                     String simidx=isIndex(simbols[i],2);
-                    portox=portox.replaceAll("-portofolio SimbolX","-watchlist SimbolX");
+                    portox=portox.replaceAll("rmportofolio SimbolX","rmwatchlist SimbolX");
                     if(!simidx.equals("NA")){
                         portox=portox.replaceAll("saham SimbolX","index SimbolX");
                         portox=portox.replaceAll("SimbolX",simidx.toUpperCase());
@@ -828,7 +828,7 @@ public class Controller {
                 flexTemplate = IOUtils.toString(classLoader.getResourceAsStream("flex_stock.json"));
                 for(int i=1; i<=flexText.size();i++){
                     if(i==7 && !isIndex(flexText.get(0).toLowerCase()).equals("NA")){
-                        String tblPorto = "{\"type\":\"button\",\"height\":\"md\",\"action\":{\"type\":\"message\",\"label\":\"Tambah ke Portofolio\",\"text\":\"+portofolio Text7\"},\"color\":\"#2196F3\"},";
+                        String tblPorto = "{\"type\":\"button\",\"height\":\"md\",\"action\":{\"type\":\"message\",\"label\":\"Tambah ke Portofolio\",\"text\":\"adportofolio Text7\"},\"color\":\"#2196F3\"},";
                         String s1 =flexTemplate.substring(0,flexTemplate.indexOf(tblPorto));
                         String s2 =flexTemplate.substring(flexTemplate.indexOf(tblPorto)+ tblPorto.length());
                         flexTemplate=s1+s2;
